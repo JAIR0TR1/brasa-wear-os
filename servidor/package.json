@@ -1,0 +1,24 @@
+{
+  "name": "brasa-servidor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Servidor de Brasa: frases con Gemini a partir de datos agregados (nunca datos de salud exactos).",
+  "scripts": {
+    "dev": "tsx --env-file-if-exists=.env.local dev.ts",
+    "probar": "tsx --env-file-if-exists=.env.local probar.ts",
+    "tipos": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@google/genai": "2.32.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}
