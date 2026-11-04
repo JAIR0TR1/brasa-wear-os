@@ -14,10 +14,10 @@ export async function POST(req: Request) {
   const { dispositivo: _, ...datos } = d;
   const ia = await generar(
     d.idioma,
-    "Resume el día de la persona en EXACTAMENTE 2 frases cortas (máximo 14 palabras cada una): la primera sobre lo que pasó, la segunda una invitación amable para mañana.",
+    "Resume el día de la persona en EXACTAMENTE 2 frases cortas (máximo 8 palabras cada una): la primera sobre lo que pasó, la segunda una invitación amable para mañana.",
     datos,
     SalidaResumen,
-    14,
+    11,
   );
   return json(ia ? { frases: ia.frases.map(limpiar), origen: "ia" } : { frases: resumenLocal(d.idioma), origen: "local" });
 }

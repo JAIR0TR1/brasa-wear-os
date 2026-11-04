@@ -47,6 +47,13 @@ servidor/      TypeScript + Vercel + Zod + Gemini Flash-Lite
 - [x] 2 Arranque, inicio, respirar, ajustes y navegación (es/en, oscuro/claro)
 - [x] 3 Health Services (callback pasivo), reglas y tests, permisos, modo manual, simulador adb
 - [x] 4 Gráficas (pasos radial, pulso, semana) y evolución; probado en emulador
-- [ ] 5 Servidor, Gemini, Vercel, modo demo
+- [~] 5 Servidor TS + Gemini `gemini-3.5-flash-lite` funcionando en local (`npm run dev`, emulador → http://10.0.2.2:3000); reloj conectado (UUID anónimo, solo niveles). **Falta: desplegar en Vercel** y almacenamiento persistente (Upstash).
 - [ ] 6 P1, pulido, accesibilidad
 - [ ] 7 README, justificación, QA
+
+## Gemini (verificado nov-2026)
+- SDK `@google/genai` 2.32.0, `ai.models.generateContent` con `responseMimeType` + `responseJsonSchema` (de `z.toJSONSchema`).
+- La API rechaza `httpOptions.timeout` < 10 s → se usa `abortSignal` a 7 s. Latencia medida ≈ 1 s.
+- Plan gratuito: límite por minuto (429 al hacer ~40 llamadas seguidas). El reloj pide frases solo al cambiar de situación (caché + ≥ 20 s).
+- Frases ≤ 9 palabras pedidas, ≤ 12 palabras / 64 caracteres aceptadas (2 líneas del reloj).
+- La clave vive solo en `servidor/.env.local` (ignorado) y, al desplegar, en Vercel.

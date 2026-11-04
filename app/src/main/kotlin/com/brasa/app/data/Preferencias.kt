@@ -39,6 +39,15 @@ class Preferencias(private val ctx: Context) {
     )
   }
 
+  /** Id aleatorio por reloj (UUID). No identifica a la persona: no hay registro ni cuenta. */
+  suspend fun dispositivo(): String {
+    val clave = stringPreferencesKey("dispositivo")
+    ctx.almacen.data.map { it[clave] }.firstOrNull()?.let { return it }
+    val nuevo = java.util.UUID.randomUUID().toString()
+    ctx.almacen.edit { it[clave] = nuevo }
+    return nuevo
+  }
+
   suspend fun oscuro(v: Boolean) = ctx.almacen.edit { it[K.oscuro] = v }
   suspend fun demo(v: Boolean) = ctx.almacen.edit { it[K.demo] = v }
   suspend fun emocionDemo(e: Emocion?) = ctx.almacen.edit { if (e == null) it.remove(K.emocionDemo) else it[K.emocionDemo] = e.name }

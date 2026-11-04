@@ -106,7 +106,7 @@ fun Inicio(
   val frases = stringArrayResource(frasesDe(estado.emocion, estado.saludando))
   // Modo manual (sin sensores o sin permiso): la primera frase enseña a alimentar a Brasa.
   val frase = if (estado.fuente == Fuente.MANUAL && estado.pasos == 0) stringResource(R.string.manual_pista)
-    else frases[estado.frase.mod(frases.size)]
+    else estado.fraseIa ?: frases[estado.frase.mod(frases.size)]
   val descAnillo = stringResource(R.string.anillo_descripcion, (estado.progreso * 100).toInt())
 
   FondoEmocion(estado.emocion) {

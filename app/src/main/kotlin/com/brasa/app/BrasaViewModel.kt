@@ -5,6 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.brasa.app.data.Ajustes
 import com.brasa.app.data.Capacidades
+import com.brasa.app.data.ClienteServidor
+import com.brasa.app.data.NivelActividad
+import com.brasa.app.data.Situacion
+import com.brasa.app.data.nivelDe
 import com.brasa.app.data.Dia
 import com.brasa.app.data.EventoSalud
 import com.brasa.app.data.Historial
@@ -53,6 +57,10 @@ data class EstadoBrasa(
   val pulsos: List<Muestra> = emptyList(),
   val respiros: List<Respiro> = emptyList(),
   val historial: List<Int> = emptyList(),
+  /** Frase de la IA para la situación actual (null = usar el banco local). */
+  val fraseIa: String? = null,
+  /** Explicación de la meta (IA o null = frase local). */
+  val fraseMeta: String? = null,
 )
 
 private fun hoyEpoch() = LocalDate.now().toEpochDay()
@@ -62,6 +70,7 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   private val prefs = Preferencias(app)
   private val historial = Historial(app)
   private val salud = RepositorioSalud(app)
+  private val servidor = ClienteServidor()
 
   val ajustes: StateFlow<Ajustes> = prefs.ajustes.stateIn(viewModelScope, SharingStarted.Eagerly, Ajustes())
 
@@ -71,6 +80,12 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   private val saludando = MutableStateFlow(true)
   private val ahora = MutableStateFlow(System.currentTimeMillis())
   private val cargado = MutableStateFlow(false)
+  /** Caché de frases de la IA por "idioma:situación" (se piden solo al cambiar de situación). */
+  private val frasesIa = MutableStateFlow<Map<String, String>>(emptyMap())
+  private val situacion = MutableStateFlow<Situacion?>(Situacion.SALUDO)
+  private val frasesMeta = MutableStateFlow<Map<String, String>>(emptyMap())
+  private var dispositivo: String? = null
+  private var ultimaPeticion = 0L
 
   /** true cuando hay que mostrar la pantalla que explica los permisos (solo la primera vez). */
   val pedirPermisos: StateFlow<Boolean> =
@@ -78,8 +93,11 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
       .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
   val estado: StateFlow<EstadoBrasa> =
-    combine(combine(registro, ajustes, capacidades, ::Triple), frase, saludando, ahora) { (r, a, c), f, s, t ->
-      calcular(r, a, c, f, s, t)
+    combine(
+      combine(combine(registro, ajustes, capacidades, ::Triple), frase, saludando, ahora) { (r, a, c), f, s, t -> calcular(r, a, c, f, s, t) },
+      frasesIa, situacion, frasesMeta,
+    ) { e, ia, sit, metas ->
+      e.copy(fraseIa = sit?.let { ia["${idioma()}:${it.api}"] }, fraseMeta = metas[idioma()])
     }.stateIn(viewModelScope, SharingStarted.Eagerly, estadoDemo(Ajustes(demo = true), 0, true))
 
   init {
@@ -87,15 +105,22 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
       registro.value = historial.cargar(hoyEpoch())
       cargado.value = true
       iniciarSensores()
+      dispositivo = prefs.dispositivo()
+      pedirFrase(Situacion.SALUDO)
+      pedirMeta()
     }
     viewModelScope.launch { salud.eventos.collect(::aplicar) }
     // El saludo dura unos segundos; después Brasa habla según su emoción.
-    viewModelScope.launch { delay(SALUDO_MS); saludando.value = false }
+    viewModelScope.launch { delay(SALUDO_MS); saludando.value = false; situacion.value = situacionDe(estado.value.emocion); situacion.value?.let(::pedirFrase) }
     // Al cambiar de emoción, frase nueva (y deja de saludar).
     viewModelScope.launch {
       var anterior: Emocion? = null
       estado.collect { e ->
-        if (anterior != null && e.emocion != anterior) { saludando.value = false; frase.update { it + 1 } }
+        if (anterior != null && e.emocion != anterior) {
+          saludando.value = false; frase.update { it + 1 }
+          situacion.value = situacionDe(e.emocion)
+          situacion.value?.let(::pedirFrase)
+        }
         anterior = e.emocion
       }
     }
@@ -172,6 +197,8 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   fun tocarBrasa() {
     saludando.value = false
     frase.update { it + 1 }
+    // Al tocarla, Brasa varía con su banco local (la IA solo habla en momentos clave).
+    situacion.value = null
     if (!ajustes.value.demo && estado.value.fuente == Fuente.MANUAL) {
       aplicar(EventoSalud.Pasos(registro.value.hoy.pasos + PASOS_POR_TOQUE))
     }
@@ -203,6 +230,53 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
       )
     }
     if (ajustes.value.demo && ajustes.value.emocionDemo == Emocion.INQUIETA) emocionDemo(null)
+    situacion.value = Situacion.POST_RESPIRACION
+    pedirFrase(Situacion.POST_RESPIRACION, urgente = true)
+  }
+
+  /** Idioma activo de la app (el de AppCompat o, si no hay, el del sistema). */
+  private fun idioma(): String {
+    val l = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales()[0] ?: java.util.Locale.getDefault()
+    return if (l.language == "es") "es" else "en"
+  }
+
+  private fun situacionDe(e: Emocion): Situacion? = when (e) {
+    Emocion.INQUIETA -> Situacion.TENSION
+    Emocion.APAGADA -> Situacion.INACTIVIDAD
+    Emocion.EUFORICA -> Situacion.META_CUMPLIDA
+    else -> null // tranquila y feliz: banco local, sin gastar peticiones
+  }
+
+  /**
+   * Pide una frase a la IA solo si no está en caché y han pasado ≥ 20 s desde la última petición
+   * (cuota gratuita de Gemini). Solo viajan niveles agregados, nunca pasos ni pulso.
+   */
+  private fun pedirFrase(s: Situacion, urgente: Boolean = false) {
+    val id = dispositivo ?: return
+    val clave = "${idioma()}:${s.api}"
+    if (clave in frasesIa.value) return
+    val t = System.currentTimeMillis()
+    if (!urgente && t - ultimaPeticion < 20_000) return
+    ultimaPeticion = t
+    val e = estado.value
+    viewModelScope.launch {
+      servidor.mensaje(id, idioma(), s, nivelDe(e.progreso), e.emocion.name.lowercase(), e.etapa.name.lowercase())
+        ?.let { f -> frasesIa.update { it + (clave to f) } }
+    }
+  }
+
+  /** Explicación de la meta adaptativa (la meta ya la calculó el reloj con sus reglas). */
+  private fun pedirMeta() {
+    val id = dispositivo ?: return
+    val r = registro.value
+    val tendencia = when { r.meta > r.metaAnterior -> "sube"; r.meta < r.metaAnterior -> "baja"; else -> "igual" }
+    val previos = r.historial.takeLast(6)
+    val constancia = if (previos.isEmpty()) NivelActividad.BAJO else nivelDe(previos.count { it >= r.meta } / previos.size.toFloat())
+    val media = if (previos.isEmpty()) NivelActividad.BAJO else nivelDe(previos.average().toFloat() / r.meta)
+    val lengua = idioma()
+    viewModelScope.launch {
+      servidor.meta(id, lengua, tendencia, constancia, media)?.let { f -> frasesMeta.update { it + (lengua to f) } }
+    }
   }
 
   override fun onCleared() {

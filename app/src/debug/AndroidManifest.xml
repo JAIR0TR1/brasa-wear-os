@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-  <application>
+  <application android:networkSecurityConfig="@xml/red_depuracion">
     <!-- Solo depuración: simulador de sensores por adb (no existe en la versión release). -->
     <receiver android:name=".data.SimuladorReceiver" android:exported="true">
       <intent-filter>

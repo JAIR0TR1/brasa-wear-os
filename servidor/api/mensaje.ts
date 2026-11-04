@@ -14,7 +14,7 @@ const SITUACION: Record<string, string> = {
   subida_nivel: "Brasa acaba de subir de nivel: celébralo.",
 };
 
-/** POST /api/mensaje — una frase de máx. 15 palabras con la personalidad de Brasa. */
+/** POST /api/mensaje — una frase corta (≤ 15 palabras de contrato; se piden ≤ 9 para que quepa en 2 líneas del reloj). */
 export async function POST(req: Request) {
   const d = await leer(req, MensajeEntrada);
   if (d instanceof Response) return d;
@@ -23,10 +23,10 @@ export async function POST(req: Request) {
   const { dispositivo: _, ...datos } = d; // el id no se envía a la IA
   const ia = await generar(
     d.idioma,
-    `${SITUACION[d.situacion]} Escribe UNA frase de máximo 15 palabras.`,
+    `${SITUACION[d.situacion]} Escribe UNA frase de máximo 9 palabras (debe caber en 2 líneas de un reloj redondo).`,
     datos,
     SalidaFrase,
-    15,
+    12,
   );
   return json(ia ? { frase: limpiar(ia.frase), origen: "ia" } : { frase: fraseLocal(d.idioma, d.situacion), origen: "local" });
 }

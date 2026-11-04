@@ -99,7 +99,7 @@ fun BrasaApp(vm: BrasaViewModel) {
                   0 -> Inicio(estado, onTocarBrasa = vm::tocarBrasa, onRespirar = { nav.navigate(RESPIRAR) })
                   1 -> GraficaPasos(estado)
                   2 -> GraficaPulso(estado)
-                  3 -> GraficaSemana(estado)
+                  3 -> GraficaSemana(estado, fraseMeta = estado.fraseMeta)
                   4 -> Evolucion(estado)
                   else -> AjustesPantalla(
                     ajustes,
