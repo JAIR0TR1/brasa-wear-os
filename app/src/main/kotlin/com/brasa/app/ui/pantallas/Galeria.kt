@@ -26,11 +26,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.CurvedLayout
-import androidx.wear.compose.foundation.CurvedTextStyle
-import androidx.wear.compose.foundation.basicCurvedText
 import androidx.wear.compose.material3.Text
 import com.brasa.app.R
+import com.brasa.app.ui.componentes.TituloBorde
 import com.brasa.app.ui.brasa.Brasa
 import com.brasa.app.ui.brasa.Emocion
 import com.brasa.app.ui.brasa.Etapa
@@ -78,22 +76,12 @@ fun ContenidoGaleria(pagina: PaginaGaleria, tiempoFijo: Float? = null) {
   var toques by remember { mutableIntStateOf(0) }
 
   FondoEmocion(pagina.emocion) {
-    // Texto curvo arriba siguiendo el borde.
-    val curvo = stringResource(if (pagina.esEtapa) R.string.galeria_evolucion else R.string.galeria_emociones).uppercase()
-    CurvedLayout(Modifier.fillMaxSize(), anchor = 270f) {
-      basicCurvedText(
-        curvo,
-        style = CurvedTextStyle(
-          fontSize = Tipo.curvo.fontSize, fontFamily = Tipo.curvo.fontFamily, fontWeight = Tipo.curvo.fontWeight,
-          color = colores.textoSecundario, letterSpacing = Tipo.curvo.letterSpacing,
-        ),
-      )
-    }
+    TituloBorde(stringResource(if (pagina.esEtapa) R.string.galeria_evolucion else R.string.galeria_emociones))
     Column(
       Modifier.fillMaxSize().padding(horizontal = Tokens.Espacio.xl),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      Spacer(Modifier.weight(0.16f))
+      Spacer(Modifier.weight(0.24f))
       Brasa(
         emocion = pagina.emocion,
         etapa = pagina.etapa,

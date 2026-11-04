@@ -42,6 +42,8 @@ android {
   testOptions {
     unitTests {
       isIncludeAndroidResources = true
+      // Robolectric necesita acceder a DirectByteBuffer (el texto curvo de Wear usa PathIterator).
+      all { it.jvmArgs("--add-opens=java.base/java.nio=ALL-UNNAMED", "--add-opens=java.base/java.lang=ALL-UNNAMED") }
     }
   }
   packaging {

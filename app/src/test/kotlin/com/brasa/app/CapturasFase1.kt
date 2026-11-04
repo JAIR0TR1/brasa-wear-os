@@ -31,14 +31,14 @@ data class Variante(
   val escalaFuente: Float = 1f,
 )
 
-val redondoGrande = Variante("redondo-grande", "w227dp-h227dp-round-watch-xhdpi")
+val redondoGrande = Variante("redondo-grande", "es-w227dp-h227dp-round-watch-xhdpi")
 val variantes = listOf(
   redondoGrande,
-  Variante("redondo-pequeno", "w192dp-h192dp-round-watch-xhdpi"),
-  Variante("cuadrado", "w198dp-h198dp-notround-watch-xhdpi", redondo = false),
-  Variante("claro", "w227dp-h227dp-round-watch-xhdpi", oscuro = false),
+  Variante("redondo-pequeno", "es-w192dp-h192dp-round-watch-xhdpi"),
+  Variante("cuadrado", "es-w198dp-h198dp-notround-watch-xhdpi", redondo = false),
+  Variante("claro", "es-w227dp-h227dp-round-watch-xhdpi", oscuro = false),
   Variante("ingles", "en-w227dp-h227dp-round-watch-xhdpi"),
-  Variante("fuente-grande", "w227dp-h227dp-round-watch-xhdpi", escalaFuente = 1.3f),
+  Variante("fuente-grande", "es-w227dp-h227dp-round-watch-xhdpi", escalaFuente = 1.3f),
 )
 
 @RunWith(ParameterizedRobolectricTestRunner::class)

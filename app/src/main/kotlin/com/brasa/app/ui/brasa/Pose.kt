@@ -66,7 +66,7 @@ fun formaDe(etapa: Etapa): Forma = when (etapa) {
   Etapa.CHISPA -> Forma(escala = 0.74f, punta = 0.22f, extremidades = 0.82f, laterales = 0f, corona = 0f, orbita = 0f)
   Etapa.LLAMA -> Forma(escala = 0.9f, punta = 1f, extremidades = 1f, laterales = 0f, corona = 0f, orbita = 0f)
   Etapa.FOGATA -> Forma(escala = 0.98f, punta = 1.08f, extremidades = 1f, laterales = 1f, corona = 0f, orbita = 0f)
-  Etapa.LEYENDA -> Forma(escala = 1.02f, punta = 1.12f, extremidades = 1f, laterales = 1f, corona = 1f, orbita = 1f)
+  Etapa.LEYENDA -> Forma(escala = 0.96f, punta = 1.12f, extremidades = 1f, laterales = 1f, corona = 1f, orbita = 1f)
 }
 
 fun poseDe(emocion: Emocion): Pose {

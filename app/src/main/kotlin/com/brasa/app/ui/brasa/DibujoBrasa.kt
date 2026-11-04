@@ -47,7 +47,8 @@ fun DrawScope.dibujarBrasa(
 
   // Centro: deja sitio abajo para piernas y sombra.
   val cx0 = size.width / 2f
-  val cy0 = size.height / 2f - 2f * u
+  // Con corona, Brasa baja un poco para no invadir el texto curvo superior.
+  val cy0 = size.height / 2f - 2f * u + 9f * u * forma.corona
   val flota = sin(t * pose.flotaVel) * pose.flotaAmp * u
   val salto = -abs(sin(t * 3.2f)) * pose.salto * 7f * u
   val temblor = (sin(t * 47f) * 0.7f + sin(t * 31f) * 0.4f) * pose.temblor * u
@@ -65,7 +66,7 @@ fun DrawScope.dibujarBrasa(
   val bocaTemblor = pose.bocaTemblor * (1f - risa)
 
   val alturaPunta = r * 1.15f * forma.punta * (1f + 0.07f * sin(t * 7.3f) * pose.avivar)
-  val vaiven = r * (0.16f + 0.1f * sin(t * 3.1f) * pose.avivar + 0.04f * sin(t * 8.7f) * pose.avivar)
+  val vaiven = r * (0.24f + 0.12f * sin(t * 3.1f) * pose.avivar + 0.05f * sin(t * 8.7f) * pose.avivar)
 
   // 1 · Brillo (luz propia en oscuro; halo tenue en claro).
   val alfaBrillo = pose.brillo * if (oscuro) 0.55f else 0.22f
@@ -98,10 +99,10 @@ fun DrawScope.dibujarBrasa(
   // 3 · Llamas laterales (Fogata y Leyenda).
   if (forma.laterales > 0.01f) {
     for (lado in intArrayOf(-1, 1)) {
-      val ang = lado * (30f + 6f * sin(t * 2.4f + lado))
+      val ang = lado * (16f + 5f * sin(t * 2.4f + lado))
       val path = rutaLlama(
-        origen = p(lado * 0.72f * r, 0.42f * r), angulo = ang,
-        radio = 0.3f * r * forma.laterales, alto = 1.25f * r * forma.laterales,
+        origen = p(lado * 1.02f * r, 0.98f * r), angulo = ang,
+        radio = 0.34f * r * forma.laterales, alto = 1.35f * r * forma.laterales * (1f + 0.08f * sin(t * 5.3f + lado)),
         vaiven = lado * 0.12f * r * sin(t * 4.1f + lado * 1.3f),
       )
       drawPath(
@@ -132,8 +133,30 @@ fun DrawScope.dibujarBrasa(
     )
   }
 
-  // 5 · Cuerpo: gota de fuego con volumen.
-  val cuerpo = rutaCuerpo(::p, r, alturaPunta, vaiven)
+  // 5 · Cuerpo: gota de fuego con volumen + dos lenguas secundarias unidas a la silueta
+  // (tres puntas = se lee como fuego, no como gota de agua).
+  val lenguas = forma.punta.coerceAtMost(1f)
+  val cuerpo = Path().apply {
+    op(
+      rutaCuerpo(::p, r, alturaPunta, vaiven),
+      Path().apply {
+        op(
+          rutaLlama(
+            p(-0.5f * r, -0.42f * r), angulo = -24f + 5f * sin(t * 3.7f) * pose.avivar,
+            radio = 0.26f * r, alto = 1.05f * r * lenguas * (1f + 0.08f * sin(t * 6.1f) * pose.avivar),
+            vaiven = -0.08f * r * sin(t * 4.3f),
+          ),
+          rutaLlama(
+            p(0.56f * r, -0.4f * r), angulo = 26f + 5f * sin(t * 4.1f + 1f) * pose.avivar,
+            radio = 0.2f * r, alto = 0.78f * r * lenguas * (1f + 0.1f * sin(t * 7.7f + 2f) * pose.avivar),
+            vaiven = 0.06f * r * sin(t * 5.1f),
+          ),
+          PathOperation.Union,
+        )
+      },
+      PathOperation.Union,
+    )
+  }
   drawPath(
     cuerpo,
     brush = Brush.radialGradient(
@@ -147,7 +170,7 @@ fun DrawScope.dibujarBrasa(
     drawPath(
       rutaCuerpo(::p, r * 0.62f, alturaPunta * 1.05f, vaiven * 1.1f, desplazY = -0.32f * r),
       brush = Brush.verticalGradient(
-        0f to pose.nucleo.copy(alpha = 0.95f), 0.55f to pose.nucleo.copy(alpha = 0.25f), 1f to Color.Transparent,
+        0f to pose.nucleo.copy(alpha = 0.7f), 0.5f to pose.nucleo.copy(alpha = 0.16f), 1f to Color.Transparent,
         startY = p(0f, puntaY).y, endY = p(0f, -0.25f * r).y,
       ),
     )
@@ -159,14 +182,14 @@ fun DrawScope.dibujarBrasa(
   rotate(-32f, pivot = esp) {
     drawOval(
       brush = Brush.radialGradient(
-        0f to Color.White.copy(alpha = 0.75f), 1f to Color.White.copy(alpha = 0f),
+        0f to Color.White.copy(alpha = 0.5f), 1f to Color.White.copy(alpha = 0f),
         center = esp, radius = 0.26f * r,
       ),
       topLeft = Offset(esp.x - 0.13f * r, esp.y - 0.25f * r),
       size = Size(0.26f * r, 0.5f * r),
     )
   }
-  drawCircle(Color.White.copy(alpha = 0.6f), radius = 0.045f * r, center = p(-0.34f * r, -0.74f * r))
+  drawCircle(Color.White.copy(alpha = 0.45f), radius = 0.04f * r, center = p(-0.3f * r, -0.72f * r))
 
   // 6 · Brazos (delante): "manguera" curva con mano redonda.
   val colorBrazo = lerp(pose.base, pose.borde, 0.12f)
@@ -217,7 +240,7 @@ fun DrawScope.dibujarBrasa(
     }
   }
   if (forma.corona > 0.01f) {
-    dibujarCorona(p(vaiven * 0.5f, puntaY - 0.3f * r + sin(t * 2f) * 0.04f * r), r, forma.corona)
+    dibujarCorona(p(vaiven * 0.5f, puntaY - 0.34f * r + sin(t * 2f) * 0.04f * r), r * 1.35f, forma.corona)
   }
   if (forma.orbita > 0.01f) {
     for (i in 0 until 3) {
@@ -293,11 +316,11 @@ private fun DrawScope.dibujarCara(
   bocaTemblor: Float,
 ) {
   val tinta = Tokens.Colores.Pupila
-  val rx = 0.125f * r
-  val ry = (0.165f * r * pose.ojoAbierto * (1f - parpadeo)).coerceAtLeast(0.014f * r)
+  val rx = 0.15f * r
+  val ry = (0.2f * r * pose.ojoAbierto * (1f - parpadeo)).coerceAtLeast(0.014f * r)
 
   for (lado in intArrayOf(-1, 1)) {
-    val c = p(lado * 0.36f * r, -0.02f * r)
+    val c = p(lado * 0.39f * r, -0.02f * r)
 
     // Ojo normal (con párpado caído si está apagada).
     val alfaOjo = 1f - ojoFeliz
@@ -348,7 +371,7 @@ private fun DrawScope.dibujarCara(
     }
     // Mejillas.
     if (pose.mejillas > 0.01f) {
-      val m = p(lado * 0.6f * r, 0.22f * r)
+      val m = p(lado * 0.64f * r, 0.24f * r)
       drawOval(
         brush = Brush.radialGradient(
           0f to Tokens.Colores.Mejilla.copy(alpha = 0.65f * pose.mejillas), 1f to Color.Transparent,
@@ -361,7 +384,7 @@ private fun DrawScope.dibujarCara(
 
   // Boca.
   val mb = p(0f, 0.3f * r)
-  val ancho = 0.17f * r
+  val ancho = 0.21f * r
   val alfaLinea = (1f - bocaAbierta) * (1f - bocaTemblor)
   if (alfaLinea > 0.01f) {
     val sonrisa = Path().apply {

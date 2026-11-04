@@ -16,7 +16,7 @@
 
   <string name="galeria_emociones">Emociones</string>
   <string name="galeria_evolucion">Evolución</string>
-  <string name="regla_apagada">meta &lt; 20 % · sin moverte</string>
+  <string name="regla_apagada">meta &lt; 20 % · quieta</string>
   <string name="regla_inquieta">pulso alto en reposo</string>
   <string name="regla_tranquila">meta 20–60 %</string>
   <string name="regla_feliz">meta 60–99 %</string>
