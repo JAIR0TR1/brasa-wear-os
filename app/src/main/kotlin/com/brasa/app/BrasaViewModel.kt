@@ -89,6 +89,16 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
       iniciarSensores()
     }
     viewModelScope.launch { salud.eventos.collect(::aplicar) }
+    // El saludo dura unos segundos; después Brasa habla según su emoción.
+    viewModelScope.launch { delay(SALUDO_MS); saludando.value = false }
+    // Al cambiar de emoción, frase nueva (y deja de saludar).
+    viewModelScope.launch {
+      var anterior: Emocion? = null
+      estado.collect { e ->
+        if (anterior != null && e.emocion != anterior) { saludando.value = false; frase.update { it + 1 } }
+        anterior = e.emocion
+      }
+    }
     // Reloj interno: la tensión y la inactividad dependen del tiempo, no solo de nuevos datos.
     viewModelScope.launch { while (true) { delay(30_000); ahora.value = System.currentTimeMillis(); revisarDia() } }
   }
@@ -201,6 +211,7 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
 
   companion object {
     const val PASOS_POR_TOQUE = 250
+    const val SALUDO_MS = 6000L
   }
 }
 

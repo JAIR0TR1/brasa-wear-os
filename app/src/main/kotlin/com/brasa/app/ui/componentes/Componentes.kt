@@ -71,7 +71,8 @@ fun AnilloBorde(
     val arco = Size(lado, lado)
     drawArc(colores.pista, 0f, 360f, false, topLeft, arco, style = Stroke(g))
     val p = anim.value
-    if (p <= 0.001f) return@Canvas
+    // Por debajo del 1 % no se dibuja arco ni punto de luz (no hay progreso que señalar).
+    if (p < 0.01f) return@Canvas
     val inicio = lerp(color, colores.fondo, if (colores.oscuro) 0.55f else 0.35f)
     rotate(-90f) {
       drawArc(

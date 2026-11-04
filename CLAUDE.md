@@ -18,7 +18,8 @@ App de Wear OS (Kotlin + Compose for Wear OS) con una mascota de fuego que lee p
 - `JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"`, SDK en `%LOCALAPPDATA%\Android\Sdk`.
 - `sdkmanager` está obsoleto: usar `cmdline-tools/latest/bin/android.exe` (`android sdk install`, `android docs search|fetch`).
 - Emulador: AVD `Brasa_Wear_Redondo` (Wear OS 5, API 34, wearos_large_round). Necesita el driver AEHD instalado.
-- Compilar: `./gradlew :app:assembleDebug`. Capturas: `./gradlew :app:recordRoborazziDebug` → `docs/capturas/roborazzi/`.
+- Compilar: `./gradlew :app:assembleDebug` (**sin `-q`**: con `-q` + configuration cache se instaló un APK viejo).
+- Emulador: `emulator -avd Brasa_Wear_Redondo`; app en español: `adb shell cmd locale set-app-locales com.brasa.app --locales es`. En Git Bash usar `MSYS_NO_PATHCONV=1` con rutas `/sdcard`. Capturas: `./gradlew :app:recordRoborazziDebug` → `docs/capturas/roborazzi/`.
 
 ## Versiones verificadas (Google Maven / Maven Central, nov-2026)
 AGP 9.0.1 · Gradle 9.1.0 · Kotlin 2.3.20 · Compose BOM 2026.03.01 · Wear Compose 1.7.1 · Health Services 1.1.0 · DataStore 1.3.0 · AppCompat 1.8.0 · kotlinx.serialization 1.12.0 · Roborazzi 1.77.0 · Robolectric 4.17.
