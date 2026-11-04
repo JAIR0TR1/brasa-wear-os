@@ -25,4 +25,70 @@
   <string name="niveles_llama">nivel 5–9</string>
   <string name="niveles_fogata">nivel 10–19</string>
   <string name="niveles_leyenda">nivel 20+</string>
+
+  <string name="arranque_descripcion">Brasa está despertando. Toca para saltar.</string>
+  <string name="anillo_descripcion">Meta de hoy al %1$d por ciento</string>
+  <string name="respirar">Respirar</string>
+  <string name="respiro_prepara">Prepárate</string>
+  <string name="respiro_inhala">Inhala</string>
+  <string name="respiro_exhala">Exhala</string>
+  <string name="respiro_completo">Bien hecho</string>
+  <string name="respiro_antes_despues">%1$d → %2$d lpm</string>
+  <string name="respiro_sin_pulso">Tu llama vuelve a su ritmo.</string>
+  <string name="lpm">lpm</string>
+  <string name="listo">Listo</string>
+
+  <string name="ajustes">Ajustes</string>
+  <string name="ajuste_tema">Tema</string>
+  <string name="tema_oscuro">Oscuro</string>
+  <string name="tema_claro">Claro</string>
+  <string name="ajuste_idioma">Idioma</string>
+  <string name="idioma_sistema">Del sistema</string>
+  <string name="ajuste_demo">Modo demo</string>
+  <string name="activado">Activado</string>
+  <string name="desactivado">Desactivado</string>
+  <string name="ajuste_emocion">Emoción</string>
+  <string name="ajuste_etapa">Etapa</string>
+  <string name="automatica">Automática</string>
+  <string name="aviso_medico">Brasa no es un dispositivo médico: lee señales de tensión, no diagnostica.</string>
+  <string name="aviso_privacidad">Tus pasos y tu pulso nunca salen del reloj.</string>
+
+  <string-array name="frases_saludo">
+    <item>¡A encender el día!</item>
+    <item>Hola, aquí sigo ardiendo.</item>
+    <item>¿Damos unos pasos juntos?</item>
+  </string-array>
+  <string-array name="frases_apagada">
+    <item>Me estoy apagando… ¿caminamos?</item>
+    <item>Unos pasos y vuelvo a brillar.</item>
+    <item>Llevo rato quieta. ¿Te mueves?</item>
+    <item>Necesito un poco de leña.</item>
+    <item>Un paseo corto me reaviva.</item>
+  </string-array>
+  <string-array name="frases_inquieta">
+    <item>Noto tensión. ¿Respiramos?</item>
+    <item>Un minuto de aire nos calma.</item>
+    <item>Vamos despacio, juntas.</item>
+  </string-array>
+  <string-array name="frases_tranquila">
+    <item>Vamos bien, sin prisa.</item>
+    <item>Ardo a fuego lento.</item>
+    <item>Un poco más y brillo de verdad.</item>
+    <item>Buen ritmo. Sigamos.</item>
+    <item>Me gusta este calorcito.</item>
+  </string-array>
+  <string-array name="frases_feliz">
+    <item>¡Qué bien te mueves!</item>
+    <item>¡Mírame brillar!</item>
+    <item>Ya casi llegamos a la meta.</item>
+    <item>Tus pasos me encienden.</item>
+    <item>¡Esto es fuego del bueno!</item>
+  </string-array>
+  <string-array name="frases_euforica">
+    <item>¡Meta cumplida! ¡Ardo de alegría!</item>
+    <item>¡Lo logramos! ¡Qué hoguera!</item>
+    <item>¡Hoy somos leyenda!</item>
+    <item>¡No me cabe tanto fuego!</item>
+    <item>¡Récord de chispas!</item>
+  </string-array>
 </resources>

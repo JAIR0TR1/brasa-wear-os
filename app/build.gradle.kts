@@ -35,6 +35,10 @@ android {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
   }
+  androidResources {
+    // Genera LocaleConfig (idiomas por app en Ajustes del sistema, API 33+).
+    generateLocaleConfig = true
+  }
   buildFeatures {
     compose = true
     buildConfig = true
@@ -62,6 +66,8 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.core.splashscreen)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.lifecycle.runtime.compose)
   implementation(libs.androidx.lifecycle.viewmodel.compose)
   implementation(libs.compose.ui)

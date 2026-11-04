@@ -22,13 +22,17 @@ import com.brasa.app.ui.theme.Tokens
  * Título superior que sigue el borde: curvo en pantallas redondas, recto y centrado en cuadradas.
  */
 @Composable
-fun TituloBorde(texto: String, color: Color = BrasaTema.colores.textoSecundario) {
+fun TituloBorde(
+  texto: String,
+  color: Color = BrasaTema.colores.textoSecundario,
+  margen: androidx.compose.ui.unit.Dp = Tokens.Espacio.s,
+) {
   val t = texto.uppercase()
   if (LocalConfiguration.current.isScreenRound) {
     CurvedLayout(Modifier.fillMaxSize(), anchor = 270f) {
       basicCurvedText(
         t,
-        modifier = CurvedModifier.padding(Tokens.Espacio.s),
+        modifier = CurvedModifier.padding(margen),
         style = CurvedTextStyle(
           fontSize = Tipo.curvo.fontSize, fontFamily = Tipo.curvo.fontFamily, fontWeight = Tipo.curvo.fontWeight,
           color = color, letterSpacing = Tipo.curvo.letterSpacing,
@@ -36,7 +40,7 @@ fun TituloBorde(texto: String, color: Color = BrasaTema.colores.textoSecundario)
       )
     }
   } else {
-    Box(Modifier.fillMaxSize().padding(top = Tokens.Espacio.s), contentAlignment = Alignment.TopCenter) {
+    Box(Modifier.fillMaxSize().padding(top = margen), contentAlignment = Alignment.TopCenter) {
       Text(t, style = Tipo.curvo, color = color, maxLines = 1)
     }
   }
