@@ -3,7 +3,12 @@ import { z } from "zod";
 
 /** Modelo Flash-Lite estable (verificado en la lista oficial de modelos, nov-2026). Configurable por entorno. */
 export const MODELO = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
-const TIMEOUT_MS = 4_000;
+/**
+ * Corte propio a 7 s con AbortSignal (la función de Vercel tiene 10 s).
+ * Nota verificada: la API rechaza httpOptions.timeout < 10 s ("Minimum allowed deadline is 10s"),
+ * por eso no se usa ese campo. Latencia medida: ~1 s.
+ */
+const TIMEOUT_MS = 7_000;
 
 let cliente: GoogleGenAI | null = null;
 export const iaDisponible = () => Boolean(process.env.GEMINI_API_KEY);
@@ -35,7 +40,7 @@ export const limpiar = (t: string) =>
   t.replace(/[\p{Extended_Pictographic}\u{FE0F}]/gu, "").replace(/["“”«»]/g, "").replace(/\s+/g, " ").trim();
 
 /**
- * Pide a Gemini un JSON que cumpla [esquema]. Si no hay clave, tarda más de 4 s, falla o la salida
+ * Pide a Gemini un JSON que cumpla [esquema]. Si no hay clave, tarda más de 7 s, falla o la salida
  * no valida, devuelve null y el llamador usa el respaldo local. La app nunca se bloquea.
  */
 export async function generar<T extends z.ZodType>(
@@ -56,7 +61,6 @@ export async function generar<T extends z.ZodType>(
         responseJsonSchema: z.toJSONSchema(esquema),
         temperature: 0.95,
         maxOutputTokens: 120,
-        httpOptions: { timeout: TIMEOUT_MS },
         abortSignal: AbortSignal.timeout(TIMEOUT_MS),
       },
     });
@@ -67,7 +71,8 @@ export async function generar<T extends z.ZodType>(
     return valido.data;
   } catch (e) {
     // Sin datos personales en los logs: solo el tipo de fallo.
-    console.warn("ia_fallo", e instanceof Error ? e.name : "desconocido");
+    const estado = (e as { status?: number })?.status;
+    console.warn("ia_fallo", e instanceof Error ? e.name : "desconocido", estado ?? "", e instanceof Error ? e.message.slice(0, 160) : "");
     return null;
   }
 }
