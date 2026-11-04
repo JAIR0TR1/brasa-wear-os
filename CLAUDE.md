@@ -57,3 +57,18 @@ servidor/      TypeScript + Vercel + Zod + Gemini Flash-Lite
 - Plan gratuito: límite por minuto (429 al hacer ~40 llamadas seguidas). El reloj pide frases solo al cambiar de situación (caché + ≥ 20 s).
 - Frases ≤ 9 palabras pedidas, ≤ 12 palabras / 64 caracteres aceptadas (2 líneas del reloj).
 - La clave vive solo en `servidor/.env.local` (ignorado) y, al desplegar, en Vercel.
+
+## Dónde quedamos (4-nov-2026) y siguientes pasos
+Hecho: fases 0–4 completas y probadas en emulador; fase 5 a medias (servidor + Gemini funcionando en local, reloj conectado).
+Siguiente, en orden:
+1. **Desplegar `servidor/` en Vercel** (el usuario inicia sesión en Vercel y pega `GEMINI_API_KEY` en Settings → Environment Variables). Luego `SERVER_URL=https://<proyecto>.vercel.app` en `local.properties`.
+2. (Opcional) Upstash Redis para `/api/brasa/{dispositivo}`; hoy en memoria.
+3. Fase 6: P1 pendiente (háptica de celebración al cumplir meta y al subir de nivel, animación de subida de nivel, resumen del día con IA por la noche), pulido de movimiento, accesibilidad, revisión visual final.
+4. Fase 7: README, docs/justificacion-diseno.md (Nielsen, Gestalt, Fitts, WCAG), docs/QA.md.
+5. P2 (si sobra tiempo): tile de Wear OS.
+Pendiente del usuario: rotar la clave de Gemini tras la entrega (se compartió por chat).
+
+## Cómo retomar
+- Abrir la carpeta `C:\dev\brasa` en VS Code y abrir Claude Code ahí.
+- Emulador: `%LOCALAPPDATA%\Android\Sdk\emulator\emulator.exe -avd Brasa_Wear_Redondo`
+- Servidor local: `cd servidor && npm run dev` (puerto 3000; si "EADDRINUSE", cerrar el node viejo).
