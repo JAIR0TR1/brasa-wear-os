@@ -2,6 +2,7 @@ package com.brasa.app.ui.pantallas
 
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -53,14 +54,20 @@ private fun cambiarIdioma() {
 fun AjustesPantalla(ajustes: Ajustes, acciones: AccionesAjustes, idiomaActual: String = AppCompatDelegate.getApplicationLocales().toLanguageTags()) {
   val colores = BrasaTema.colores
   val acento = colores.fuego
-  val estado = rememberScalingLazyListState()
+  val estado = rememberScalingLazyListState(initialCenterItemIndex = 0)
   val idioma = when {
     idiomaActual.isEmpty() -> stringResource(R.string.idioma_sistema)
     idiomaActual.startsWith("es") -> "Español"
     else -> "English"
   }
   FondoEmocion(Emocion.TRANQUILA, intensidad = 0.5f) {
-    ScalingLazyColumn(Modifier.fillMaxSize(), state = estado) {
+    ScalingLazyColumn(
+      Modifier.fillMaxSize(),
+      state = estado,
+      autoCentering = null,
+      // Márgenes laterales: las filas no tocan el borde del círculo.
+      contentPadding = PaddingValues(start = 14.dp, end = 14.dp, top = 30.dp, bottom = 44.dp),
+    ) {
       item {
         Text(stringResource(R.string.ajustes), style = Tipo.titulo, color = colores.texto, modifier = Modifier.padding(bottom = Tokens.Espacio.xs))
       }

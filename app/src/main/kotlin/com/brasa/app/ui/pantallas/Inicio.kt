@@ -36,6 +36,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
 import com.brasa.app.EstadoBrasa
 import com.brasa.app.R
@@ -107,21 +108,23 @@ fun Inicio(
 
   FondoEmocion(estado.emocion) {
     AnilloBorde(estado.progreso, acento, animado = animado, descripcion = descAnillo)
-    TituloBorde(reloj, margen = 16.dp)
+    TituloBorde(reloj, margen = 20.dp)
     Column(
       Modifier.fillMaxSize().padding(horizontal = Tokens.Espacio.xl),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      Spacer(Modifier.weight(0.2f))
+      // Hueco fijo para la hora curva: Brasa nunca la pisa.
+      Spacer(Modifier.height(36.dp))
       Brasa(
         emocion = estado.emocion,
         etapa = estado.etapa,
         reaccion = toques,
         tiempoFijo = tiempoFijo,
         modifier = Modifier
-          .fillMaxWidth(0.82f)
+          .fillMaxWidth()
           .weight(1f)
-          .graphicsLayer { scaleX = nacer.value; scaleY = nacer.value; alpha = nacer.value.coerceIn(0f, 1f) }
+          // 1.14 creciendo hacia abajo: Brasa es la protagonista (puede invadir un poco su margen interno, nunca el texto).
+          .graphicsLayer { scaleX = nacer.value * 1.14f; scaleY = nacer.value * 1.14f; alpha = nacer.value.coerceIn(0f, 1f); transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0.15f) }
           .clickable(remember { MutableInteractionSource() }, indication = null) {
             toques++
             haptica.toque()
@@ -133,11 +136,10 @@ fun Inicio(
         verticalAlignment = Alignment.Bottom,
         modifier = Modifier.semantics(mergeDescendants = true) {},
       ) {
-        Text(pasos, style = Tipo.cifra, color = colores.texto, maxLines = 1)
+        Text(pasos, style = Tipo.cifra.copy(fontSize = 25.sp), color = colores.texto, maxLines = 1)
         Spacer(Modifier.width(Tokens.Espacio.xs))
-        Text("/ $meta", style = Tipo.dato, color = colores.textoSecundario, maxLines = 1, modifier = Modifier.padding(bottom = 5.dp))
+        Text("/ $meta", style = Tipo.dato, color = colores.textoSecundario, maxLines = 1, modifier = Modifier.padding(bottom = 4.dp))
       }
-      Spacer(Modifier.height(Tokens.Espacio.xs))
       // Frase de Brasa (o botón Respirar si está inquieta).
       Box(Modifier.heightIn(min = 36.dp), contentAlignment = Alignment.Center) {
         AnimatedContent(
@@ -153,12 +155,13 @@ fun Inicio(
           } else {
             Text(
               f, style = Tipo.voz, color = acento, maxLines = 2, overflow = TextOverflow.Ellipsis,
-              modifier = Modifier.padding(horizontal = Tokens.Espacio.s),
+              // Abajo el círculo se estrecha: la frase queda dentro del anillo.
+              modifier = Modifier.padding(horizontal = Tokens.Espacio.l),
             )
           }
         }
       }
-      Spacer(Modifier.height(Tokens.Espacio.xl))
+      Spacer(Modifier.height(Tokens.Espacio.l + Tokens.Espacio.xs))
     }
   }
 }

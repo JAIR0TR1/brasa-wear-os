@@ -173,7 +173,7 @@ private fun ResultadoRespiro(etapa: Etapa, antes: Int?, despues: Int?, onListo: 
       Brasa(Emocion.FELIZ, etapa, Modifier.fillMaxWidth(0.62f).weight(1f), tiempoFijo = tiempoFijo)
       if (antes != null && despues != null) {
         Row(verticalAlignment = Alignment.Bottom) {
-          Text("${despues - antes}", style = Tipo.cifra, color = colores.texto)
+          Text((despues - antes).let { if (it < 0) "−${-it}" else "+$it" }, style = Tipo.cifra, color = colores.texto)
           Spacer(Modifier.width(Tokens.Espacio.xs))
           Text(stringResource(R.string.lpm), style = Tipo.dato, color = colores.textoSecundario, modifier = Modifier.padding(bottom = 5.dp))
         }

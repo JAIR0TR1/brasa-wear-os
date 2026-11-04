@@ -40,3 +40,31 @@ Lo que ya funcionaba: las 5 emociones se distinguen **por forma, no solo por col
 | Con fuente ×1,3 "pulso alto en reposo" se sale del círculo (en 192 dp, al límite) | nada cortado / fuente grande | Subtítulo con margen lateral extra y hasta 2 líneas en lugar de recortarse |
 
 **Resultado final fase 1:** pasa en las 6 variantes. Lámina: `docs/capturas/lamina-fase1.png`.
+
+---
+
+## Fase 2 — Arranque, Inicio, Respirar, Ajustes
+
+### Ronda 1
+| Problema | Criterio | Corrección |
+|---|---|---|
+| En Inicio Brasa queda pequeña y la cifra de pasos domina | Brasa protagonista / jerarquía | Hueco fijo para la hora, Brasa a todo el ancho, cifra 30 → 25 sp |
+| Con fuente grande la hora curva pisa la punta de la llama | nada cortado | Espacio superior fijo (36 dp) independiente del tamaño de letra |
+| Ajustes: filas tocan el borde del círculo y el título flota en el centro | márgenes seguros | `contentPadding` lateral 14 dp, lista empieza arriba (`autoCentering = null`) |
+| Resultado "-14" con guion | tipografía | Signo menos real "−" |
+
+Lo que ya funcionaba: el remolino de anillos opuestos del arranque, la respiración (Brasa dentro de ondas que crecen con ella y fondo que "respira"), el botón Respirar en inquieta (no depende solo del color: icono + texto), tema claro con identidad.
+
+### Ronda 2
+| Problema | Criterio | Corrección |
+|---|---|---|
+| Brasa aún algo pequeña en Inicio | protagonista | Escala ×1,14 creciendo hacia abajo (origen arriba) |
+| Eufórica: salto + punto de luz del anillo al 100 % pisan la hora | nada cortado | Hora con margen 20 dp; Brasa crece hacia abajo |
+| Una chispa de eufórica roza la hora | nada cortado | Órbita de chispas más lateral (factor vertical 0,9 → 0,62) |
+
+### Ronda 3 (lámina completa)
+| Problema | Criterio | Corrección |
+|---|---|---|
+| Frases de una línea llegan hasta el anillo | márgenes seguros | Margen lateral de la frase 8 → 16 dp |
+
+**Resultado fase 2:** pasa. Lámina: `docs/capturas/lamina-fase2.png`.

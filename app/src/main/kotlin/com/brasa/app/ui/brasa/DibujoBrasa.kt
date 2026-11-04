@@ -234,7 +234,7 @@ fun DrawScope.dibujarBrasa(
     for (i in 0 until 6) {
       val ang = (i * 60f + t * 22f) * (PI.toFloat() / 180f)
       val rad = 1.9f * r + sin(t * 3f + i) * 0.12f * r
-      val centro = Offset(cx + cos(ang) * rad, cy - 0.35f * r + sin(ang) * rad * 0.9f)
+      val centro = Offset(cx + cos(ang) * rad, cy - 0.2f * r + sin(ang) * rad * 0.62f)
       val tam = 0.13f * r * (0.6f + 0.4f * sin(t * 5f + i * 1.7f))
       dibujarEstrella(centro, tam, if (i % 2 == 0) Tokens.Colores.Dorado else Tokens.Colores.FuegoClaro, pose.chispas)
     }
