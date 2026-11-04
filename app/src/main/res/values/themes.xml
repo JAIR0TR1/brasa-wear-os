@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="Theme.Brasa" parent="android:Theme.DeviceDefault">
+    <item name="android:windowBackground">@android:color/black</item>
+  </style>
+
+  <!-- Splash del sistema: negro con la chispa; luego nuestro arranque animado. -->
+  <style name="Theme.Brasa.Arranque" parent="Theme.SplashScreen">
+    <item name="windowSplashScreenBackground">@android:color/black</item>
+    <item name="windowSplashScreenAnimatedIcon">@drawable/ic_chispa</item>
+    <item name="postSplashScreenTheme">@style/Theme.Brasa</item>
+  </style>
+</resources>

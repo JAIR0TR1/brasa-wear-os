@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="brasa_descripcion">Brasa, %1$s, %2$s stage</string>
+
+  <string name="emocion_apagada">dim</string>
+  <string name="emocion_inquieta">restless</string>
+  <string name="emocion_tranquila">calm</string>
+  <string name="emocion_feliz">happy</string>
+  <string name="emocion_euforica">ecstatic</string>
+
+  <string name="etapa_chispa">Spark</string>
+  <string name="etapa_llama">Flame</string>
+  <string name="etapa_fogata">Bonfire</string>
+  <string name="etapa_leyenda">Legend</string>
+
+  <string name="galeria_emociones">Moods</string>
+  <string name="galeria_evolucion">Evolution</string>
+  <string name="regla_apagada">goal &lt; 20 % · idle</string>
+  <string name="regla_inquieta">high resting pulse</string>
+  <string name="regla_tranquila">goal 20–60 %</string>
+  <string name="regla_feliz">goal 60–99 %</string>
+  <string name="regla_euforica">goal reached</string>
+  <string name="niveles_chispa">level 1–4</string>
+  <string name="niveles_llama">level 5–9</string>
+  <string name="niveles_fogata">level 10–19</string>
+  <string name="niveles_leyenda">level 20+</string>
+</resources>

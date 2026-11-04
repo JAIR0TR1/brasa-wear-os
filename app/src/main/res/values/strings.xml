@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">Brasa</string>
+  <string name="brasa_descripcion">Brasa, %1$s, etapa %2$s</string>
+
+  <string name="emocion_apagada">apagada</string>
+  <string name="emocion_inquieta">inquieta</string>
+  <string name="emocion_tranquila">tranquila</string>
+  <string name="emocion_feliz">feliz</string>
+  <string name="emocion_euforica">eufórica</string>
+
+  <string name="etapa_chispa">Chispa</string>
+  <string name="etapa_llama">Llama</string>
+  <string name="etapa_fogata">Fogata</string>
+  <string name="etapa_leyenda">Leyenda</string>
+
+  <string name="galeria_emociones">Emociones</string>
+  <string name="galeria_evolucion">Evolución</string>
+  <string name="regla_apagada">meta &lt; 20 % · sin moverte</string>
+  <string name="regla_inquieta">pulso alto en reposo</string>
+  <string name="regla_tranquila">meta 20–60 %</string>
+  <string name="regla_feliz">meta 60–99 %</string>
+  <string name="regla_euforica">meta cumplida</string>
+  <string name="niveles_chispa">nivel 1–4</string>
+  <string name="niveles_llama">nivel 5–9</string>
+  <string name="niveles_fogata">nivel 10–19</string>
+  <string name="niveles_leyenda">nivel 20+</string>
+</resources>
