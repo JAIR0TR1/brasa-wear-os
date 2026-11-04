@@ -33,3 +33,10 @@ Lo que ya funcionaba: las 5 emociones se distinguen **por forma, no solo por col
 | En pantalla cuadrada el texto curvo no tiene sentido y la corona choca con el título | cuadrado | Componente `TituloBorde`: curvo si `isScreenRound`, recto si no |
 
 **Resultado:** pasa. Pendiente para fase 2: indicador de página en cuadrado (se ve como arco; aceptable), áreas táctiles se validan en pantallas con botones.
+
+### Ronda 4 (lámina completa)
+| Problema | Criterio | Corrección |
+|---|---|---|
+| Con fuente ×1,3 "pulso alto en reposo" se sale del círculo (en 192 dp, al límite) | nada cortado / fuente grande | Subtítulo con margen lateral extra y hasta 2 líneas en lugar de recortarse |
+
+**Resultado final fase 1:** pasa en las 6 variantes. Lámina: `docs/capturas/lamina-fase1.png`.

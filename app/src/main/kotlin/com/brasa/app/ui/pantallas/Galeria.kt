@@ -101,9 +101,11 @@ fun ContenidoGaleria(pagina: PaginaGaleria, tiempoFijo: Float? = null) {
       )
       Text(
         stringResource(pagina.detalle),
-        style = Tipo.dato, color = acento, maxLines = 1, overflow = TextOverflow.Ellipsis,
+        style = Tipo.dato, color = acento, maxLines = 2, overflow = TextOverflow.Ellipsis,
+        // Más margen abajo: el círculo se estrecha y el texto debe quedar dentro.
+        modifier = Modifier.padding(horizontal = Tokens.Espacio.l),
       )
-      Spacer(Modifier.height(Tokens.Espacio.xl + Tokens.Espacio.s))
+      Spacer(Modifier.height(Tokens.Espacio.xl))
     }
   }
 }

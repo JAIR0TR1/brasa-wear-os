@@ -41,8 +41,8 @@ servidor/      TypeScript + Vercel + Zod + Gemini Flash-Lite
 ```
 
 ## Fases (estado)
-- [ ] 0 Entorno, git, proyecto, emulador
-- [ ] 1 Dirección de arte, tokens, Brasa + 5 emociones + galería, revisión visual
+- [x] 0 Entorno, git, proyecto (emulador creado; falta driver AEHD como admin)
+- [x] 1 Dirección de arte, tokens, Brasa + 5 emociones + galería, revisión visual
 - [ ] 2 Arranque, inicio, respirar, navegación (es/en, oscuro/claro)
 - [ ] 3 Health Services y reglas
 - [ ] 4 Gráficas y evolución
