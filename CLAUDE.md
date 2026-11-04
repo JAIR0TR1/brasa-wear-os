@@ -46,7 +46,7 @@ servidor/      TypeScript + Vercel + Zod + Gemini Flash-Lite
 - [x] 1 Dirección de arte, tokens, Brasa + 5 emociones + galería, revisión visual
 - [x] 2 Arranque, inicio, respirar, ajustes y navegación (es/en, oscuro/claro)
 - [x] 3 Health Services (callback pasivo), reglas y tests, permisos, modo manual, simulador adb
-- [ ] 4 Gráficas y evolución
+- [x] 4 Gráficas (pasos radial, pulso, semana) y evolución; probado en emulador
 - [ ] 5 Servidor, Gemini, Vercel, modo demo
 - [ ] 6 P1, pulido, accesibilidad
 - [ ] 7 README, justificación, QA

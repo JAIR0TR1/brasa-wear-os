@@ -34,7 +34,7 @@
   <string name="respiro_exhala">Exhala</string>
   <string name="respiro_completo">Bien hecho</string>
   <string name="respiro_antes_despues">%1$d → %2$d lpm</string>
-  <string name="respiro_sin_pulso">Tu llama vuelve a su ritmo.</string>
+  <string name="respiro_sin_pulso">Un minuto para ti. Eso ya cuenta.</string>
   <string name="lpm">lpm</string>
   <string name="listo">Listo</string>
 
@@ -101,4 +101,29 @@
   <string name="permisos_manual">Modo manual · toca para pedir</string>
   <string name="permisos_demo">Simulados (demo)</string>
   <string name="manual_pista">Tócame para darme leña.</string>
+
+  <string name="grafica_pasos_desc">Pasos por hora: %1$d en total, pico a las %2$d horas</string>
+  <string name="pasos_hoy">pasos hoy</string>
+  <string name="pico_a_las">pico a las %1$s</string>
+  <string name="sin_pasos_aun">Aún sin pasos hoy</string>
+  <string name="pulso_hoy">Pulso hoy</string>
+  <string name="reposo_max">reposo %1$d · máx %2$d</string>
+  <string name="sin_pulso_aun">Aún sin datos de pulso</string>
+  <string name="grafica_pulso_desc">Pulso de hoy: reposo %1$d, máximo %2$d latidos por minuto</string>
+  <string name="tras_respirar">%1$s lpm tras respirar</string>
+  <string name="semana">Semana</string>
+  <string name="dias_cumplidos">%1$d de %2$d días cumplidos</string>
+  <string name="grafica_semana_desc">Semana: %1$d de %2$d días con la meta de %3$d pasos</string>
+  <string name="meta_valor">meta %1$s</string>
+  <string name="meta_sube">Subí tu meta: gran semana.</string>
+  <string name="meta_baja">Bajé tu meta para que llegues.</string>
+  <string name="meta_igual">Tu meta sigue igual: buen ritmo.</string>
+  <string name="evolucion">Evolución</string>
+  <string name="evolucion_desc">Etapa %1$s, nivel %2$d, %3$d XP, racha de %4$d días</string>
+  <string name="nivel_xp">nivel %1$d · %2$s XP</string>
+  <string name="racha_dias">%1$d d</string>
+  <string name="siguiente_etapa">%1$s en nivel %2$d · faltan %3$s XP</string>
+  <string name="etapa_maxima">Ya eres leyenda. No hay fuego más grande.</string>
+  <string name="sin_pulso_pista">Ajusta el reloj a la muñeca y vuelvo a medir.</string>
+  <string name="primer_dia">Tu primer día con Brasa</string>
 </resources>

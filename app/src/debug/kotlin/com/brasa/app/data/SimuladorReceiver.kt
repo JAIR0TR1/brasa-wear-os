@@ -16,9 +16,9 @@ class SimuladorReceiver : BroadcastReceiver() {
     if (intent.hasExtra("pasos")) CanalSalud.eventos.tryEmit(EventoSalud.Pasos(intent.getIntExtra("pasos", 0)))
     if (intent.hasExtra("pulso")) {
       val bpm = intent.getIntExtra("pulso", 0)
-      // Tres lecturas seguidas: la regla de tensión exige al menos 2 en la ventana.
+      // Tres lecturas a 70 s (se guarda 1 por minuto; la regla exige ≥ 2 en 3 min).
       val ahora = System.currentTimeMillis()
-      for (i in 2 downTo 0) CanalSalud.eventos.tryEmit(EventoSalud.Pulso(bpm, ahora - i * 30_000L))
+      for (i in 2 downTo 0) CanalSalud.eventos.tryEmit(EventoSalud.Pulso(bpm, ahora - i * 70_000L))
     }
   }
 }

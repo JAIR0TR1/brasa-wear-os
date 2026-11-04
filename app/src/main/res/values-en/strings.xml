@@ -33,7 +33,7 @@
   <string name="respiro_exhala">Breathe out</string>
   <string name="respiro_completo">Well done</string>
   <string name="respiro_antes_despues">%1$d → %2$d bpm</string>
-  <string name="respiro_sin_pulso">Your flame is back in rhythm.</string>
+  <string name="respiro_sin_pulso">A minute for you. That counts.</string>
   <string name="lpm">bpm</string>
   <string name="listo">Done</string>
 
@@ -100,4 +100,29 @@
   <string name="permisos_manual">Manual mode · tap to ask</string>
   <string name="permisos_demo">Simulated (demo)</string>
   <string name="manual_pista">Tap me to feed my fire.</string>
+
+  <string name="grafica_pasos_desc">Steps per hour: %1$d total, peak at %2$d o\'clock</string>
+  <string name="pasos_hoy">steps today</string>
+  <string name="pico_a_las">peak at %1$s</string>
+  <string name="sin_pasos_aun">No steps yet today</string>
+  <string name="pulso_hoy">Pulse today</string>
+  <string name="reposo_max">rest %1$d · max %2$d</string>
+  <string name="sin_pulso_aun">No pulse data yet</string>
+  <string name="grafica_pulso_desc">Pulse today: rest %1$d, max %2$d beats per minute</string>
+  <string name="tras_respirar">%1$s bpm after breathing</string>
+  <string name="semana">Week</string>
+  <string name="dias_cumplidos">%1$d of %2$d days reached</string>
+  <string name="grafica_semana_desc">Week: %1$d of %2$d days at the %3$d step goal</string>
+  <string name="meta_valor">goal %1$s</string>
+  <string name="meta_sube">Goal up: great week.</string>
+  <string name="meta_baja">Goal down so you can reach it.</string>
+  <string name="meta_igual">Goal stays: nice rhythm.</string>
+  <string name="evolucion">Evolution</string>
+  <string name="evolucion_desc">%1$s stage, level %2$d, %3$d XP, %4$d day streak</string>
+  <string name="nivel_xp">level %1$d · %2$s XP</string>
+  <string name="racha_dias">%1$d d</string>
+  <string name="siguiente_etapa">%1$s at level %2$d · %3$s XP to go</string>
+  <string name="etapa_maxima">You are a legend. No bigger fire.</string>
+  <string name="sin_pulso_pista">Snug the watch on your wrist and I\'ll measure again.</string>
+  <string name="primer_dia">Your first day with Brasa</string>
 </resources>

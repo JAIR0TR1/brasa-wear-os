@@ -173,7 +173,7 @@ private fun ResultadoRespiro(etapa: Etapa, antes: Int?, despues: Int?, onListo: 
     ) {
       Spacer(Modifier.weight(0.25f))
       Brasa(Emocion.FELIZ, etapa, Modifier.fillMaxWidth(0.62f).weight(1f), tiempoFijo = tiempoFijo)
-      if (antes != null && despues != null) {
+      if (antes != null && despues != null && despues < antes) {
         Row(verticalAlignment = Alignment.Bottom) {
           Text((despues - antes).let { if (it < 0) "−${-it}" else "+$it" }, style = Tipo.cifra, color = colores.texto)
           Spacer(Modifier.width(Tokens.Espacio.xs))
@@ -181,7 +181,11 @@ private fun ResultadoRespiro(etapa: Etapa, antes: Int?, despues: Int?, onListo: 
         }
         Text(stringResource(R.string.respiro_antes_despues, antes, despues), style = Tipo.dato, color = acento)
       } else {
+        // Si el pulso no bajó (o no hay sensor) no se presenta como logro: Brasa valora el minuto igualmente.
         Text(stringResource(R.string.respiro_sin_pulso), style = Tipo.voz, color = acento, maxLines = 2)
+        if (antes != null && despues != null) {
+          Text(stringResource(R.string.respiro_antes_despues, antes, despues), style = Tipo.dato, color = colores.textoSecundario)
+        }
       }
       Spacer(Modifier.height(Tokens.Espacio.s))
       BotonBrasa(stringResource(R.string.listo), acento, onListo)

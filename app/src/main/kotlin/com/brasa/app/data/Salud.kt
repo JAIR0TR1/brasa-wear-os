@@ -48,6 +48,7 @@ class RepositorioSalud(private val ctx: Context) {
 
   suspend fun capacidades(): Capacidades = try {
     val c = cliente.getCapabilitiesAsync().await()
+    Log.i(TAG, "pasivo soporta: ${c.supportedDataTypesPassiveMonitoring.map { it.name }}")
     Capacidades(
       pasos = DataType.STEPS_DAILY in c.supportedDataTypesPassiveMonitoring,
       pulso = DataType.HEART_RATE_BPM in c.supportedDataTypesPassiveMonitoring,

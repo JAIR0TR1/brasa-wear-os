@@ -238,9 +238,10 @@ fun estadoDemo(a: Ajustes, f: Int, s: Boolean): EstadoBrasa {
 }
 
 /** Día típico: pico al ir al trabajo, al mediodía y por la tarde. */
-fun demoPasosPorHora(total: Int): List<Int> {
+fun demoPasosPorHora(total: Int, horaActual: Int = java.time.LocalTime.now().hour): List<Int> {
   val forma = listOf(0, 0, 0, 0, 0, 0, 2, 9, 12, 5, 4, 6, 10, 7, 4, 4, 6, 9, 13, 5, 3, 1, 0, 0)
-  val suma = forma.sum().toFloat()
+    .mapIndexed { h, v -> if (h <= horaActual) v else 0 }
+  val suma = forma.sum().toFloat().coerceAtLeast(1f)
   return forma.map { (it / suma * total).toInt() }
 }
 

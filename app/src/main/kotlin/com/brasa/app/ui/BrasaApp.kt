@@ -12,6 +12,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.focusable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.rotary.onRotaryScrollEvent
+import com.brasa.app.ui.pantallas.Evolucion
+import com.brasa.app.ui.pantallas.GraficaPasos
+import com.brasa.app.ui.pantallas.GraficaPulso
+import com.brasa.app.ui.pantallas.GraficaSemana
+import kotlinx.coroutines.launch
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
@@ -32,6 +45,7 @@ import com.brasa.app.ui.theme.Tokens
 
 private const val PRINCIPAL = "principal"
 private const val RESPIRAR = "respirar"
+private const val PAGINAS = 6
 
 /**
  * Navegación: arranque → páginas principales (deslizar horizontal: Inicio · Ajustes; la fase 4 añade
@@ -58,11 +72,35 @@ fun BrasaApp(vm: BrasaViewModel) {
         val nav = rememberSwipeDismissableNavController()
         SwipeDismissableNavHost(nav, startDestination = PRINCIPAL) {
           composable(PRINCIPAL) {
-            val paginas = rememberPagerState { 2 }
-            Box(Modifier.fillMaxSize()) {
-              HorizontalPager(paginas, Modifier.fillMaxSize()) { i ->
+            val paginas = rememberPagerState { PAGINAS }
+            val alcance = rememberCoroutineScope()
+            val foco = remember { FocusRequester() }
+            var acumulado by remember { mutableFloatStateOf(0f) }
+            Box(
+              Modifier
+                .fillMaxSize()
+                // Corona / bisel giratorio: pasa de página entre Inicio, gráficas y evolución.
+                .onRotaryScrollEvent { e ->
+                  if (paginas.currentPage == PAGINAS - 1) return@onRotaryScrollEvent false
+                  acumulado += e.verticalScrollPixels
+                  if (kotlin.math.abs(acumulado) > 60f) {
+                    val destino = (paginas.currentPage + if (acumulado > 0) 1 else -1).coerceIn(0, PAGINAS - 1)
+                    acumulado = 0f
+                    alcance.launch { paginas.animateScrollToPage(destino) }
+                  }
+                  true
+                }
+                .focusRequester(foco)
+                .focusable(),
+            ) {
+              LaunchedEffect(Unit) { foco.requestFocus() }
+              HorizontalPager(paginas, Modifier.fillMaxSize(), beyondViewportPageCount = 0) { i ->
                 when (i) {
                   0 -> Inicio(estado, onTocarBrasa = vm::tocarBrasa, onRespirar = { nav.navigate(RESPIRAR) })
+                  1 -> GraficaPasos(estado)
+                  2 -> GraficaPulso(estado)
+                  3 -> GraficaSemana(estado)
+                  4 -> Evolucion(estado)
                   else -> AjustesPantalla(
                     ajustes,
                     AccionesAjustes(
@@ -73,7 +111,7 @@ fun BrasaApp(vm: BrasaViewModel) {
                   )
                 }
               }
-              IndicadorPaginas(total = 2, actual = paginas.currentPage)
+              IndicadorPaginas(total = PAGINAS, actual = paginas.currentPage)
             }
           }
           composable(RESPIRAR) {

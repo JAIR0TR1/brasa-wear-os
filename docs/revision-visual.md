@@ -68,3 +68,39 @@ Lo que ya funcionaba: el remolino de anillos opuestos del arranque, la respiraci
 | Frases de una línea llegan hasta el anillo | márgenes seguros | Margen lateral de la frase 8 → 16 dp |
 
 **Resultado fase 2:** pasa. Lámina: `docs/capturas/lamina-fase2.png`.
+
+---
+
+## Fase 3 — Prueba en emulador (Wear OS 5, API 34) con Health Services real + simulador adb
+| Hallazgo | Corrección |
+|---|---|
+| El saludo nunca se cambiaba aunque cambiara la emoción | Saludo de 6 s; frase nueva en cada cambio de emoción |
+| Punto de luz del anillo brillando con 10 pasos (sin arco visible) | Por debajo del 1 % no se dibuja |
+| Tensión no se activaba con el simulador: se guarda 1 pulso/min y la regla exige ≥ 2 lecturas en 3 min | Simulador espaciado a 70 s (con sensor real se cumple sola) |
+| Resultado de respirar "+20 lpm" presentado como logro (el HS del emulador genera pulso sintético ~100–125) | Si el pulso no baja: "Un minuto para ti. Eso ya cuenta." y el dato en gris |
+| Permisos: el botón Permitir quedaba bajo el pliegue | Texto más corto; acción principal visible sin desplazar |
+
+## Fase 4 — Gráficas y evolución
+
+### Ronda 1 (Roborazzi, datos demo)
+| Problema | Criterio | Corrección |
+|---|---|---|
+| Demo pintaba pasos en horas futuras | coherencia | El demo solo rellena hasta la hora actual |
+| El pico de pulso no tenía cifra | jerarquía | Cifra sobre el punto (TextMeasurer en Canvas) |
+| XP sin separador de miles ("3065") | idiomas | `NumberFormat` según el idioma |
+
+### Ronda 2 (lámina)
+| Problema | Criterio | Corrección |
+|---|---|---|
+| Pulso vacío: pantalla casi negra y eje cortado | estados vacíos | `EstadoVacio`: Brasa tranquila + mensaje + pista |
+| Pasos en 192 dp / fuente grande: centro choca con las barras | nada cortado | Centro compacto (26 sp) con 0 h/12 h dentro |
+| Frase de la meta truncada en 192 dp | textos cortos | Frases más cortas |
+
+### Ronda 3 (emulador con datos reales)
+| Problema | Criterio | Corrección |
+|---|---|---|
+| Semana con un solo día: barra gigante y "0 de 0 días" | estados vacíos | Siempre 7 huecos; "Tu primer día con Brasa" |
+| Chip "+20 lpm tras respirar" con pulso que subió | honestidad | Solo se muestra si bajó; hueco reservado para que el eje no se mueva |
+| Evolución: última línea cortada en el borde | nada cortado | Margen lateral extra |
+
+**Resultado fase 4:** pasa. Lámina: `docs/capturas/lamina-fase4.png`; emulador: `docs/capturas/emulador/`.
