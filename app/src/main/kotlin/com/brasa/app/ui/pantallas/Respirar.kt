@@ -70,7 +70,7 @@ fun Respirar(
   etapa: Etapa,
   pulsoAntes: Int?,
   pulsoDespues: (Int) -> Int,
-  onCompletado: () -> Unit,
+  onCompletado: (antes: Int?, despues: Int?) -> Unit,
   onListo: () -> Unit,
   faseFija: FaseRespiro? = null,
   tiempoFijo: Float? = null,
@@ -80,6 +80,7 @@ fun Respirar(
   val total = remember { Animatable(if (faseFija != null) 0.38f else 0f) }
   var fase by remember { mutableStateOf(faseFija ?: FaseRespiro.PREPARA) }
   var restante by remember { mutableIntStateOf(if (faseFija != null) 37 else TOTAL_S) }
+  var despues by remember { mutableStateOf(if (faseFija != null) pulsoAntes?.let(pulsoDespues) else null) }
 
   if (faseFija == null) {
     LaunchedEffect(Unit) {
@@ -94,14 +95,15 @@ fun Respirar(
         haptica.exhala()
         escala.animateTo(ESCALA_MIN, tween(EXHALA_MS, easing = FastOutSlowInEasing))
       }
+      despues = pulsoAntes?.let(pulsoDespues)
       fase = FaseRespiro.FIN
       haptica.celebrar()
-      onCompletado()
+      onCompletado(pulsoAntes, despues)
     }
   }
 
   if (fase == FaseRespiro.FIN) {
-    ResultadoRespiro(etapa, pulsoAntes, pulsoAntes?.let(pulsoDespues), onListo, tiempoFijo)
+    ResultadoRespiro(etapa, pulsoAntes, despues, onListo, tiempoFijo)
     return
   }
 

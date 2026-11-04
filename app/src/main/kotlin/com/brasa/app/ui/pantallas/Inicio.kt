@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Text
 import com.brasa.app.EstadoBrasa
+import com.brasa.app.Fuente
 import com.brasa.app.R
 import com.brasa.app.ui.brasa.Brasa
 import com.brasa.app.ui.brasa.Emocion
@@ -103,7 +104,9 @@ fun Inicio(
   val pasos = remember(estado.pasos, locale) { NumberFormat.getIntegerInstance(locale).format(estado.pasos) }
   val meta = remember(estado.meta, locale) { NumberFormat.getIntegerInstance(locale).format(estado.meta) }
   val frases = stringArrayResource(frasesDe(estado.emocion, estado.saludando))
-  val frase = frases[estado.frase.mod(frases.size)]
+  // Modo manual (sin sensores o sin permiso): la primera frase enseña a alimentar a Brasa.
+  val frase = if (estado.fuente == Fuente.MANUAL && estado.pasos == 0) stringResource(R.string.manual_pista)
+    else frases[estado.frase.mod(frases.size)]
   val descAnillo = stringResource(R.string.anillo_descripcion, (estado.progreso * 100).toInt())
 
   FondoEmocion(estado.emocion) {

@@ -98,4 +98,5 @@ object Reglas {
 }
 
 /** Lectura de pulso con su instante (ms desde epoch). */
+@kotlinx.serialization.Serializable
 data class Muestra(val ms: Long, val bpm: Int)

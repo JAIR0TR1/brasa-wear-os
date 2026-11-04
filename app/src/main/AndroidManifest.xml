@@ -5,6 +5,19 @@
   <!-- Vibraciones de ritmo (respiración) y de reacción. -->
   <uses-permission android:name="android.permission.VIBRATE" />
 
+  <!-- Salud (docs: Health Services, Declare appropriate permissions). -->
+  <!-- Pasos -->
+  <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+  <!-- Pulso: BODY_SENSORS hasta Wear OS 5.1 (API 35); READ_HEART_RATE desde API 36. -->
+  <uses-permission android:name="android.permission.BODY_SENSORS" android:maxSdkVersion="35" />
+  <uses-permission android:name="android.permission.health.READ_HEART_RATE" />
+  <!-- Internet: solo frases y explicaciones con datos agregados (fase 5). -->
+  <uses-permission android:name="android.permission.INTERNET" />
+
+  <!-- El hardware no es obligatorio para instalar: sin sensores la app funciona en modo manual. -->
+  <uses-feature android:name="android.hardware.sensor.heartrate" android:required="false" />
+  <uses-feature android:name="android.hardware.sensor.stepcounter" android:required="false" />
+
   <application
     android:allowBackup="true"
     android:icon="@drawable/ic_brasa"

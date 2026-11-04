@@ -70,3 +70,21 @@ class ReglasTest {
     assertEquals(0, Reglas.racha(listOf(9000, 100), 8000))
   }
 }
+
+class HistorialTest {
+  @Test fun cambioDeDiaCierraElDiaYRecalculaMeta() {
+    val r = com.brasa.app.data.Registro(com.brasa.app.data.Dia(epochDay = 100, pasos = 9000), historial = List(6) { 8000 }, meta = 8000)
+    val n = com.brasa.app.data.Historial.cambiarDia(r, 101)
+    assertEquals(101, n.hoy.epochDay)
+    assertEquals(0, n.hoy.pasos)
+    assertEquals(9000, n.historial.last())
+    assertEquals(8000, n.metaAnterior)
+    assertEquals(8600, n.meta) // media 8143 × 1,05 = 8550 → 8600
+    assertEquals(90, n.xpPrevio)
+  }
+
+  @Test fun mismoDiaNoCambia() {
+    val r = com.brasa.app.data.Registro(com.brasa.app.data.Dia(epochDay = 100, pasos = 500))
+    assertEquals(r, com.brasa.app.data.Historial.cambiarDia(r, 100))
+  }
+}

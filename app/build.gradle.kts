@@ -80,6 +80,8 @@ dependencies {
   implementation(libs.wear.compose.ui.tooling)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.serialization.json)
+  implementation(libs.health.services)
+  implementation(libs.kotlinx.coroutines.guava)
   debugImplementation(libs.compose.ui.tooling)
   debugImplementation(libs.compose.ui.test.manifest)
 

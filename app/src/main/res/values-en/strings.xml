@@ -90,4 +90,14 @@
     <item>Too much fire to hold!</item>
     <item>A record of sparks!</item>
   </string-array>
+
+  <string name="permisos_titulo">Hi, I\'m Brasa</string>
+  <string name="permisos_texto">I read your steps and pulse to know how to help.</string>
+  <string name="permitir">Allow</string>
+  <string name="ahora_no">Not now</string>
+  <string name="ajuste_permisos">Health sensors</string>
+  <string name="permisos_activos">Active</string>
+  <string name="permisos_manual">Manual mode · tap to ask</string>
+  <string name="permisos_demo">Simulated (demo)</string>
+  <string name="manual_pista">Tap me to feed my fire.</string>
 </resources>

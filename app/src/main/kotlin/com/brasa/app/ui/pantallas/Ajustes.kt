@@ -14,6 +14,7 @@ import androidx.core.os.LocaleListCompat
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.Text
+import com.brasa.app.Fuente
 import com.brasa.app.R
 import com.brasa.app.data.Ajustes
 import com.brasa.app.ui.brasa.Emocion
@@ -32,6 +33,7 @@ data class AccionesAjustes(
   val demo: (Boolean) -> Unit,
   val emocion: (Emocion?) -> Unit,
   val etapa: (Etapa?) -> Unit,
+  val permisos: () -> Unit = {},
 )
 
 private fun <T> siguiente(actual: T?, valores: List<T>): T? {
@@ -51,7 +53,12 @@ private fun cambiarIdioma() {
 }
 
 @Composable
-fun AjustesPantalla(ajustes: Ajustes, acciones: AccionesAjustes, idiomaActual: String = AppCompatDelegate.getApplicationLocales().toLanguageTags()) {
+fun AjustesPantalla(
+  ajustes: Ajustes,
+  acciones: AccionesAjustes,
+  idiomaActual: String = AppCompatDelegate.getApplicationLocales().toLanguageTags(),
+  fuente: Fuente = Fuente.SENSORES,
+) {
   val colores = BrasaTema.colores
   val acento = colores.fuego
   val estado = rememberScalingLazyListState(initialCenterItemIndex = 0)
@@ -104,6 +111,19 @@ fun AjustesPantalla(ajustes: Ajustes, acciones: AccionesAjustes, idiomaActual: S
             acento, { acciones.etapa(siguiente(e, Etapa.entries)) }, Modifier.fillMaxWidth(),
           )
         }
+      }
+      item {
+        FilaAjuste(
+          stringResource(R.string.ajuste_permisos),
+          stringResource(
+            when (fuente) {
+              Fuente.SENSORES -> R.string.permisos_activos
+              Fuente.MANUAL -> R.string.permisos_manual
+              Fuente.DEMO -> R.string.permisos_demo
+            },
+          ),
+          acento, acciones.permisos, Modifier.fillMaxWidth(),
+        )
       }
       item {
         Box(Modifier.padding(top = Tokens.Espacio.s, start = 6.dp, end = 6.dp)) {

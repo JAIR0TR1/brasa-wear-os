@@ -16,7 +16,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import com.brasa.app.BrasaViewModel
+import com.brasa.app.data.permisosSalud
+import com.brasa.app.ui.pantallas.Permisos
 import com.brasa.app.ui.pantallas.AccionesAjustes
 import com.brasa.app.ui.pantallas.AjustesPantalla
 import com.brasa.app.ui.pantallas.Arranque
@@ -37,12 +41,19 @@ private const val RESPIRAR = "respirar"
 fun BrasaApp(vm: BrasaViewModel) {
   val ajustes by vm.ajustes.collectAsStateWithLifecycle()
   val estado by vm.estado.collectAsStateWithLifecycle()
+  val pedirPermisos by vm.pedirPermisos.collectAsStateWithLifecycle()
+  val lanzador = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+    vm.permisosRespondidos()
+  }
+  val pedir = { lanzador.launch(permisosSalud) }
   var arrancado by rememberSaveable { mutableStateOf(false) }
 
   BrasaTheme(oscuro = ajustes.oscuro) {
     Crossfade(arrancado, animationSpec = tween(Tokens.Duracion.media), label = "arranque") { listo ->
       if (!listo) {
         Arranque(onFin = { arrancado = true })
+      } else if (pedirPermisos) {
+        Permisos(onPermitir = pedir, onAhoraNo = vm::permisosRespondidos)
       } else {
         val nav = rememberSwipeDismissableNavController()
         SwipeDismissableNavHost(nav, startDestination = PRINCIPAL) {
@@ -56,8 +67,9 @@ fun BrasaApp(vm: BrasaViewModel) {
                     ajustes,
                     AccionesAjustes(
                       tema = { vm.tema(it) }, demo = { vm.demo(it) },
-                      emocion = { vm.emocionDemo(it) }, etapa = { vm.etapaDemo(it) },
+                      emocion = { vm.emocionDemo(it) }, etapa = { vm.etapaDemo(it) }, permisos = pedir,
                     ),
+                    fuente = estado.fuente,
                   )
                 }
               }
@@ -65,12 +77,13 @@ fun BrasaApp(vm: BrasaViewModel) {
             }
           }
           composable(RESPIRAR) {
-            val antes = vm.pulsoAntesRespirar()
+            // Se fija al entrar: el "antes" no cambia durante el ejercicio.
+            val antes = androidx.compose.runtime.remember { vm.pulsoAntesRespirar() }
             Respirar(
               etapa = estado.etapa,
               pulsoAntes = antes,
               pulsoDespues = vm::pulsoDespuesRespirar,
-              onCompletado = { vm.emocionDemo(null) },
+              onCompletado = vm::respiroCompletado,
               onListo = { nav.popBackStack() },
             )
           }

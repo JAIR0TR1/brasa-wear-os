@@ -45,7 +45,7 @@ fun estadoDe(e: Emocion, etapa: Etapa = Etapa.LLAMA): EstadoBrasa {
 /** Pantallas a capturar en la fase 2. */
 val pantallasFase2: List<String> = listOf("arranque-1-chispa", "arranque-2-remolino", "arranque-3-colapso", "arranque-4-destello") +
   Emocion.entries.map { "inicio-${it.name.lowercase()}" } +
-  listOf("inicio-saludo", "respirar-inhala", "respirar-resultado", "ajustes")
+  listOf("inicio-saludo", "respirar-inhala", "respirar-resultado", "ajustes", "permisos", "inicio-manual")
 
 @Composable
 fun ContenidoFase2(nombre: String) {
@@ -54,14 +54,16 @@ fun ContenidoFase2(nombre: String) {
       val p = mapOf("1" to 0.12f, "2" to 0.5f, "3" to 0.78f, "4" to 0.9f)[nombre.substringAfter("arranque-").take(1)]!!
       Canvas(Modifier.fillMaxSize().background(Color.Black)) { dibujarArranque(p) }
     }
+    nombre == "inicio-manual" -> Inicio(estadoDe(Emocion.APAGADA).copy(pasos = 0, progreso = 0f, fuente = Fuente.MANUAL), {}, {}, entrada = false, tiempoFijo = 1.3f, hora = "09:30")
     nombre == "inicio-saludo" -> Inicio(estadoDe(Emocion.FELIZ).copy(saludando = true), {}, {}, entrada = false, tiempoFijo = 1.3f, hora = "08:15")
     nombre.startsWith("inicio-") -> Box(Modifier.fillMaxSize()) {
       val e = Emocion.valueOf(nombre.substringAfter("inicio-").uppercase())
       Inicio(estadoDe(e), {}, {}, entrada = false, tiempoFijo = 1.3f, hora = "10:42")
       IndicadorPaginas(total = 2, actual = 0)
     }
-    nombre == "respirar-inhala" -> Respirar(Etapa.LLAMA, 96, { it - 14 }, {}, {}, faseFija = FaseRespiro.INHALA, tiempoFijo = 1.3f)
-    nombre == "respirar-resultado" -> Respirar(Etapa.LLAMA, 96, { it - 14 }, {}, {}, faseFija = FaseRespiro.FIN, tiempoFijo = 1.3f)
+    nombre == "respirar-inhala" -> Respirar(Etapa.LLAMA, 96, { it - 14 }, { _, _ -> }, {}, faseFija = FaseRespiro.INHALA, tiempoFijo = 1.3f)
+    nombre == "respirar-resultado" -> Respirar(Etapa.LLAMA, 96, { it - 14 }, { _, _ -> }, {}, faseFija = FaseRespiro.FIN, tiempoFijo = 1.3f)
+    nombre == "permisos" -> com.brasa.app.ui.pantallas.Permisos({}, {}, tiempoFijo = 1.3f)
     else -> AjustesPantalla(Ajustes(emocionDemo = Emocion.INQUIETA), AccionesAjustes({}, {}, {}, {}), idiomaActual = "")
   }
 }
@@ -76,7 +78,7 @@ class CapturasFase2(private val pantalla: Int, private val variante: Variante) {
     @ParameterizedRobolectricTestRunner.Parameters(name = "{0}-{1}")
     fun casos(): List<Array<Any>> {
       val todas = pantallasFase2.indices.map { arrayOf<Any>(it, redondoGrande) }
-      val clave = listOf("inicio-feliz", "inicio-inquieta", "respirar-inhala", "respirar-resultado", "ajustes")
+      val clave = listOf("inicio-feliz", "inicio-inquieta", "respirar-inhala", "respirar-resultado", "ajustes", "permisos")
         .map { pantallasFase2.indexOf(it) }
       return todas + clave.flatMap { p -> variantes.drop(1).map { arrayOf<Any>(p, it) } }
     }

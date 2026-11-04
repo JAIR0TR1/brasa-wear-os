@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <!-- Solo depuración: simulador de sensores por adb (no existe en la versión release). -->
+    <receiver android:name=".data.SimuladorReceiver" android:exported="true">
+      <intent-filter>
+        <action android:name="com.brasa.app.SIMULAR" />
+      </intent-filter>
+    </receiver>
+  </application>
+</manifest>

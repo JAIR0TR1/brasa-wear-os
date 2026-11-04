@@ -91,4 +91,14 @@
     <item>¡No me cabe tanto fuego!</item>
     <item>¡Récord de chispas!</item>
   </string-array>
+
+  <string name="permisos_titulo">Hola, soy Brasa</string>
+  <string name="permisos_texto">Leo tus pasos y tu pulso para saber cómo ayudarte.</string>
+  <string name="permitir">Permitir</string>
+  <string name="ahora_no">Ahora no</string>
+  <string name="ajuste_permisos">Sensores de salud</string>
+  <string name="permisos_activos">Activos</string>
+  <string name="permisos_manual">Modo manual · toca para pedir</string>
+  <string name="permisos_demo">Simulados (demo)</string>
+  <string name="manual_pista">Tócame para darme leña.</string>
 </resources>
