@@ -72,3 +72,21 @@ Pendiente del usuario: rotar la clave de Gemini tras la entrega (se compartió p
 - Abrir la carpeta `C:\dev\brasa` en VS Code y abrir Claude Code ahí.
 - Emulador: `%LOCALAPPDATA%\Android\Sdk\emulator\emulator.exe -avd Brasa_Wear_Redondo`
 - Servidor local: `cd servidor && npm run dev` (puerto 3000; si "EADDRINUSE", cerrar el node viejo).
+
+## Reglas de trabajo y lecciones aprendidas
+- Respetar todas las reglas de este archivo: tokens en Tokens.kt, sin Modifier.blur, sin strings en el código (es y en), privacidad, no es dispositivo médico.
+- No cambiar la dirección de arte, la mascota, la arquitectura ni las versiones de librerías. No agregar funciones que no se pidan.
+- NUNCA abrir, leer, buscar ni mostrar claves: ni servidor/.env.local, ni notas o archivos de texto del usuario, ni variables con claves. Para usarlas, pasarlas por comandos que no impriman el valor.
+- Trabajar en la rama "mejoras-v1". Commits en español tras cada paso que compile y pase pruebas.
+- Después de cada paso: ./gradlew :app:assembleDebug (sin -q), ./gradlew :app:testDebugUnitTest y ./gradlew :app:verifyRoborazziDebug (record solo si el cambio visual es intencional, revisando las capturas). Si algo se rompe, revertir.
+- Si se necesita algo del usuario, detenerse y decirle exactamente qué hacer, en pasos simples.
+- Nada de relleno: sin textos de ejemplo presentados como reales, botones que no hacen nada ni pantallas vacías. Si algo no está listo, se oculta.
+- No inventar datos, métricas ni funciones. En modo demo los datos deben ser creíbles y estar marcados como demo.
+- Nada cortado en el borde: revisar cada texto en redondo grande, redondo pequeño, cuadrado, fuente grande (×1,3), inglés y tema claro.
+- Cada toque y gesto hace lo que dice. Áreas táctiles ≥ 48 dp.
+- Animaciones fluidas que respetan "reducir movimiento" sin dejar la pantalla rota o vacía.
+- Accesibilidad: contraste AA, descripciones para TalkBack, orden de lectura lógico.
+- Coherencia: nombre, versión, descripción y tecnologías iguales en la app, README, CLAUDE.md y portafolio.
+- "Listo" solo cuando está VERIFICADO (Roborazzi + emulador), explicando cómo se comprobó. Si un cambio no se ve en el emulador, confirmar que se instaló el APK nuevo.
+- La app debe funcionar SIEMPRE, aunque el servidor o internet fallen.
+- Usar las skills disponibles cuando ayuden (diseño de interfaces, pruebas, revisión de código), respetando este archivo, y decir cuáles se usaron.
