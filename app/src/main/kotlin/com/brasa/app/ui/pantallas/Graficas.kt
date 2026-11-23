@@ -196,7 +196,9 @@ fun GraficaPulso(estado: EstadoBrasa, fijo: Boolean = false) {
         drawLine(colores.pista, Offset(area.left, area.bottom), Offset(area.right, area.bottom), strokeWidth = 1.dp.toPx())
         if (muestras.size < 2) return@Canvas
         val minY = (bpm.min() - 8).coerceAtLeast(40)
-        val maxY = bpm.max() + 8
+        // El umbral de tensión (reposo + 20) siempre cabe en el gráfico, aunque el día haya sido tranquilo.
+        val umbral = reposo?.let { it + com.brasa.app.domain.Reglas.MARGEN_TENSION_LPM } ?: 0
+        val maxY = maxOf(bpm.max(), umbral) + 8
         fun x(ms: Long) = area.left + ((ms - inicioDia) / 86_400_000f).coerceIn(0f, 1f) * area.width
         fun y(v: Int) = area.bottom - (v - minY).toFloat() / (maxY - minY) * area.height
         if (reposo != null) {
@@ -352,7 +354,12 @@ fun GraficaSemana(estado: EstadoBrasa, fraseMeta: String? = null, fijo: Boolean 
       }
       Spacer(Modifier.height(4.dp))
       Text(stringResource(R.string.meta_valor, metaTxt), style = Tipo.dato, color = if (colores.oscuro) Tokens.Colores.Dorado else Tokens.Colores.FuegoClaroTema)
-      Text(frase, style = Tipo.voz.copy(fontSize = 13.sp, lineHeight = 15.sp), color = acento, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = 6.dp))
+      // Abajo el círculo se estrecha: si la frase (local o de la IA) no cabe en 2 líneas, se reduce en lugar de cortarse.
+      BasicText(
+        frase, style = Tipo.voz.copy(fontSize = 13.sp, lineHeight = 15.sp, color = acento), maxLines = 2, overflow = TextOverflow.Ellipsis,
+        autoSize = TextAutoSize.StepBased(minFontSize = 10.sp, maxFontSize = 13.sp),
+        modifier = Modifier.padding(horizontal = Tokens.Espacio.m),
+      )
       Spacer(Modifier.height(22.dp))
     }
   }

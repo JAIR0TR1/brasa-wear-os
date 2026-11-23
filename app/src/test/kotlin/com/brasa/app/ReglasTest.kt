@@ -172,3 +172,21 @@ class HistorialTest {
     assertEquals(r, com.brasa.app.data.Historial.cambiarDia(r, 100))
   }
 }
+
+class DemoTest {
+  @Test fun demoNuncaPintaHorasFuturasYCuadraElTotal() {
+    for (hora in 0..23) {
+      val porHora = demoPasosPorHora(6200, hora)
+      org.junit.Assert.assertTrue("hora $hora", porHora.drop(hora + 1).all { it == 0 })
+      org.junit.Assert.assertTrue("hora $hora: total ${porHora.sum()}", porHora.sum() in 6200 - 24..6200)
+    }
+  }
+
+  @Test fun pulsoDemoLlegaSoloHastaAhora() {
+    val inicio = java.time.LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+    val p = demoPulsos(10 * 60)
+    assertEquals(10 * 60 * 60_000L, p.last().ms - inicio)
+    assertTrue(demoRespiros(10 * 60).isEmpty()) // la respiración de las 16:25 aún no ha pasado
+    assertEquals(1, demoRespiros(20 * 60).size)
+  }
+}

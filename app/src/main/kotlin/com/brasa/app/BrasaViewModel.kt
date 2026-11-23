@@ -93,6 +93,7 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   private var dispositivo: String? = null
   private var ultimaPeticion = 0L
   private var reintento: kotlinx.coroutines.Job? = null
+  private var ultimaRespiracionMs = 0L
   private val _celebraciones = kotlinx.coroutines.flow.MutableSharedFlow<Celebracion>(extraBufferCapacity = 4)
   /** Meta cumplida y subidas de nivel ocurridas mientras la app está abierta. */
   val celebraciones: kotlinx.coroutines.flow.SharedFlow<Celebracion> = _celebraciones
@@ -107,7 +108,8 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
       combine(combine(registro, ajustes, capacidades, ::Triple), frase, saludando, ahora) { (r, a, c), f, s, t -> calcular(r, a, c, f, s, t) },
       frasesIa, situacion, frasesMeta,
     ) { e, ia, sit, metas ->
-      e.copy(fraseIa = sit?.let { ia["${idioma()}:${it.api}"] }, fraseMeta = metas[idioma()])
+      // En demo la meta es de ejemplo: su explicación es la local (la de la IA describe la meta real).
+      e.copy(fraseIa = sit?.let { ia["${idioma()}:${it.api}"] }, fraseMeta = if (e.fuente == Fuente.DEMO) null else metas[idioma()])
     }.stateIn(viewModelScope, SharingStarted.Eagerly, estadoDemo(Ajustes(demo = true), 0, true))
 
   init {
@@ -142,7 +144,9 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
     viewModelScope.launch {
       var anterior: Emocion? = null
       estado.collect { e ->
-        if (anterior != null && e.emocion != anterior) {
+        // Tras respirar, Brasa mantiene un minuto su frase de reconocimiento aunque cambie de emoción.
+        val trasRespirar = System.currentTimeMillis() - ultimaRespiracionMs < 60_000
+        if (anterior != null && e.emocion != anterior && !trasRespirar) {
           saludando.value = false; frase.update { it + 1 }
           situacion.value = situacionDe(e.emocion)
           situacion.value?.let(::pedirFrase)
@@ -248,6 +252,8 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   /** Respiración completada: +10 XP y evento para la gráfica de pulso. Sale de la tensión. */
   fun respiroCompletado(antes: Int?, despues: Int?) {
     val t = System.currentTimeMillis()
+    ultimaRespiracionMs = t
+    saludando.value = false
     actualizar { r ->
       r.copy(
         respirosTotales = r.respirosTotales + 1,
@@ -356,6 +362,8 @@ fun minutoDelDia(): Int = java.time.LocalTime.now().let { it.hour * 60 + it.minu
 fun demoPasosPorHora(total: Int, horaActual: Int = java.time.LocalTime.now().hour): List<Int> {
   val forma = listOf(0, 0, 0, 0, 0, 0, 2, 9, 12, 5, 4, 6, 10, 7, 4, 4, 6, 9, 13, 5, 3, 1, 0, 0)
     .mapIndexed { h, v -> if (h <= horaActual) v else 0 }
+    // De madrugada: lo andado va a la hora actual (la suma por horas siempre coincide con el total).
+    .let { f -> if (f.sum() == 0) f.mapIndexed { h, _ -> if (h == horaActual) 1 else 0 } else f }
   val suma = forma.sum().toFloat().coerceAtLeast(1f)
   return forma.map { (it / suma * total).toInt() }
 }
