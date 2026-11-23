@@ -68,8 +68,8 @@ Mejoras futuras (no hechas a propósito):
 - El proyecto de Vercel está vinculado al repo de GitHub, pero con los despliegues automáticos por git **desactivados**: un push o unir a `main` no despliega nada. Se despliega solo con `npx vercel deploy --prod` desde `servidor/` (Root Directory del proyecto = "."; si se pone "servidor", el despliegue por CLI falla).
 
 ## Dónde quedamos (23-nov-2026)
-Versión 1.0.0 terminada en la rama `mejoras-v1` (sin unir a `main`). 170 pruebas de la app + 17 del servidor en verde; servidor en producción; APK en `entrega/Brasa-1.0.0.apk` (debug: incluye el simulador adb para la demo).
-Pendiente del usuario: probar en un reloj real, TalkBack y fuente grande (ver docs/QA.md ⬜), decidir si se une `mejoras-v1` a `main`, y rotar la clave de Gemini después de la entrega.
+Versión 1.0.0 terminada y **ya unida a `main`** (23-nov-2026): `main` y `mejoras-v1` apuntan al mismo commit y GitHub muestra la 1.0.0 por defecto. 170 pruebas de la app + 17 del servidor en verde; servidor en producción; APK en `entrega/Brasa-1.0.0.apk` (debug: incluye el simulador adb para la demo).
+Pendiente del usuario: probar en un reloj real, TalkBack y fuente grande (ver docs/QA.md ⬜), y rotar la clave de Gemini después de la entrega.
 
 ## Cómo retomar
 - Abrir la carpeta `C:\dev\brasa` en VS Code y abrir Claude Code ahí.
