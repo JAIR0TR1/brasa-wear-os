@@ -93,7 +93,7 @@
   </string-array>
 
   <string name="permisos_titulo">Hola, soy Brasa</string>
-  <string name="permisos_texto">Leo tus pasos y tu pulso para saber cómo ayudarte.</string>
+  <string name="permisos_texto">Leo tus pasos y tu pulso para ayudarte.</string>
   <string name="permitir">Permitir</string>
   <string name="ahora_no">Ahora no</string>
   <string name="ajuste_permisos">Sensores de salud</string>
@@ -126,4 +126,8 @@
   <string name="etapa_maxima">Ya eres leyenda. No hay fuego más grande.</string>
   <string name="sin_pulso_pista">Ajusta el reloj a la muñeca y vuelvo a medir.</string>
   <string name="primer_dia">Tu primer día con Brasa</string>
+  <string name="pulso_midiendo">Midiendo tu pulso</string>
+  <string name="pulso_midiendo_pista">Llevas %1$d lpm. En unos minutos verás tu día.</string>
+  <string name="primer_dia_pista">Cada día suma una barra.</string>
+  <string name="hora_eje">%1$d h</string>
 </resources>

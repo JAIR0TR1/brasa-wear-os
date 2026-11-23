@@ -42,12 +42,12 @@ fun Permisos(onPermitir: () -> Unit, onAhoraNo: () -> Unit, tiempoFijo: Float? =
       Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 26.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      Spacer(Modifier.height(14.dp))
-      Brasa(Emocion.FELIZ, Etapa.CHISPA, Modifier.fillMaxWidth(0.5f).height(56.dp), tiempoFijo = tiempoFijo)
+      Spacer(Modifier.height(Tokens.Espacio.s))
+      Brasa(Emocion.FELIZ, Etapa.CHISPA, Modifier.fillMaxWidth(0.5f).height(44.dp), tiempoFijo = tiempoFijo)
       Text(stringResource(R.string.permisos_titulo), style = Tipo.titulo, color = colores.texto)
       Spacer(Modifier.height(Tokens.Espacio.xs))
       Text(stringResource(R.string.permisos_texto), style = Tipo.voz, color = acento)
-      Spacer(Modifier.height(Tokens.Espacio.s))
+      Spacer(Modifier.height(Tokens.Espacio.xs))
       // La acción principal, visible sin desplazar.
       BotonBrasa(stringResource(R.string.permitir), acento, onPermitir)
       Box(

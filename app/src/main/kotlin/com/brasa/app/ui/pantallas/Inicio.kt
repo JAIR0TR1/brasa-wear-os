@@ -156,10 +156,12 @@ fun Inicio(
               icono = { IconoRespirar(if (colores.oscuro) Tokens.Colores.Negro else androidx.compose.ui.graphics.Color.White) },
             )
           } else {
-            Text(
-              f, style = Tipo.voz, color = acento, maxLines = 2, overflow = TextOverflow.Ellipsis,
-              // Abajo el círculo se estrecha: la frase queda dentro del anillo.
-              modifier = Modifier.padding(horizontal = Tokens.Espacio.l),
+            // Abajo el círculo se estrecha: la frase queda dentro del anillo y, si no cabe en 2 líneas,
+            // reduce su tamaño (hasta 11 sp) en lugar de cortarse.
+            androidx.compose.foundation.text.BasicText(
+              f, style = Tipo.voz.copy(color = acento), maxLines = 2, overflow = TextOverflow.Ellipsis,
+              autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(minFontSize = 11.sp, maxFontSize = Tipo.voz.fontSize),
+              modifier = Modifier.padding(horizontal = Tokens.Espacio.xl),
             )
           }
         }

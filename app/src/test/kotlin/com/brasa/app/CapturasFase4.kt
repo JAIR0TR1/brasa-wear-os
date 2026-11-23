@@ -31,11 +31,16 @@ import org.robolectric.annotation.GraphicsMode
 val pantallasFase4 = listOf(
   "grafica-pasos", "grafica-pulso", "grafica-semana", "grafica-vacia-pasos", "grafica-vacia-pulso",
   "evolucion-chispa", "evolucion-llama", "evolucion-fogata", "evolucion-leyenda",
+  "grafica-midiendo-pulso", "grafica-semana-primer-dia",
 )
+
+/** Fecha y hora fijas: las capturas no pueden depender del día en que se ejecutan. */
+val HOY_CAPTURAS: java.time.LocalDate = java.time.LocalDate.of(2026, 11, 4)
+const val MINUTO_CAPTURAS = 20 * 60
 
 @Composable
 fun ContenidoFase4(nombre: String) {
-  val demo = estadoDemo(Ajustes(demo = true), 0, false)
+  val demo = estadoDemo(Ajustes(demo = true), 0, false, MINUTO_CAPTURAS)
   val vacio = demo.copy(pasos = 0, pasosPorHora = List(24) { 0 }, pulsos = emptyList(), respiros = emptyList())
   val pagina = when {
     nombre.contains("pasos") -> 1; nombre.contains("pulso") -> 2; nombre.contains("semana") -> 3; else -> 4
@@ -44,12 +49,14 @@ fun ContenidoFase4(nombre: String) {
     when (nombre) {
       "grafica-pasos" -> GraficaPasos(demo.copy(pasosPorHora = demoPasosPorHora(demo.pasos, 20)), horaActual = 20, fijo = true)
       "grafica-pulso" -> GraficaPulso(demo, fijo = true)
-      "grafica-semana" -> GraficaSemana(demo, fijo = true)
+      "grafica-semana" -> GraficaSemana(demo, fijo = true, hoy = HOY_CAPTURAS)
+      "grafica-semana-primer-dia" -> GraficaSemana(demo.copy(historial = emptyList(), pasos = 2300, meta = 6000, metaAnterior = 6000), fijo = true, hoy = HOY_CAPTURAS)
+      "grafica-midiendo-pulso" -> GraficaPulso(demo.copy(pulsos = demo.pulsos.takeLast(2), respiros = emptyList()), fijo = true)
       "grafica-vacia-pasos" -> GraficaPasos(vacio, horaActual = 9, fijo = true)
       "grafica-vacia-pulso" -> GraficaPulso(vacio, fijo = true)
       else -> {
         val etapa = Etapa.valueOf(nombre.substringAfter("evolucion-").uppercase())
-        Evolucion(estadoDemo(Ajustes(demo = true, etapaDemo = etapa, emocionDemo = Emocion.FELIZ), 0, false), tiempoFijo = 1.3f)
+        Evolucion(estadoDemo(Ajustes(demo = true, etapaDemo = etapa, emocionDemo = Emocion.FELIZ), 0, false, MINUTO_CAPTURAS), tiempoFijo = 1.3f)
       }
     }
     IndicadorPaginas(total = 6, actual = pagina)
@@ -66,7 +73,7 @@ class CapturasFase4(private val pantalla: Int, private val variante: Variante) {
     @ParameterizedRobolectricTestRunner.Parameters(name = "{0}-{1}")
     fun casos(): List<Array<Any>> {
       val todas = pantallasFase4.indices.map { arrayOf<Any>(it, redondoGrande) }
-      val clave = listOf("grafica-pasos", "grafica-pulso", "grafica-semana", "evolucion-fogata").map { pantallasFase4.indexOf(it) }
+      val clave = listOf("grafica-pasos", "grafica-pulso", "grafica-semana", "evolucion-fogata", "grafica-midiendo-pulso", "grafica-semana-primer-dia").map { pantallasFase4.indexOf(it) }
       return todas + clave.flatMap { p -> variantes.drop(1).map { arrayOf<Any>(p, it) } }
     }
   }

@@ -4,6 +4,8 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -87,8 +90,9 @@ fun GraficaPasos(estado: EstadoBrasa, horaActual: Int = LocalTime.now().hour, fi
   FondoEmocion(Emocion.FELIZ, intensidad = 0.55f) {
     Canvas(Modifier.fillMaxSize().semantics { contentDescription = desc }) {
       val c = center
-      val rExt = size.minDimension / 2f - 10.dp.toPx()
-      val largoMax = rExt * 0.36f
+      // Margen seguro: ni la barra más larga ni su brillo llegan al borde (ni al indicador de páginas).
+      val rExt = size.minDimension / 2f - Tokens.Espacio.bordeSeguro.toPx()
+      val largoMax = rExt * 0.32f
       val rInt = rExt - largoMax
       val grosor = 4.5.dp.toPx()
       for (h in 0 until 24) {
@@ -108,26 +112,38 @@ fun GraficaPasos(estado: EstadoBrasa, horaActual: Int = LocalTime.now().hour, fi
         }
         if (esAhora) {
           drawCircle(
-            brush = Brush.radialGradient(0f to color.copy(alpha = 0.6f), 1f to Color.Transparent, center = b, radius = grosor * 3f),
-            radius = grosor * 3f, center = b,
+            brush = Brush.radialGradient(0f to color.copy(alpha = 0.6f), 1f to Color.Transparent, center = b, radius = grosor * 2.4f),
+            radius = grosor * 2.4f, center = b,
           )
         }
         drawLine(color, a, b, strokeWidth = grosor, cap = StrokeCap.Round)
       }
     }
-    // Centro compacto: debe caber dentro del anillo interior también en 192 dp y con letra grande.
-    Column(Modifier.fillMaxSize().padding(horizontal = 50.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center) {
-      Text("0 h", style = Tipo.dato.copy(fontSize = 10.sp), color = colores.textoSecundario)
-      Spacer(Modifier.height(2.dp))
-      Text(total, style = Tipo.cifra.copy(fontSize = 26.sp), color = colores.texto, maxLines = 1)
-      Text(stringResource(R.string.pasos_hoy), style = Tipo.dato, color = colores.textoSecundario)
-      Spacer(Modifier.height(2.dp))
-      Text(
-        if (hayDatos) stringResource(R.string.pico_a_las, "%02d:00".format(pico)) else stringResource(R.string.sin_pasos_aun),
-        style = Tipo.etiqueta.copy(fontSize = 11.sp), color = acento, maxLines = 1, overflow = TextOverflow.Ellipsis,
-      )
-      Spacer(Modifier.height(2.dp))
-      Text("12 h", style = Tipo.dato.copy(fontSize = 10.sp), color = colores.textoSecundario)
+    // Centro: su ancho sale del radio interior real del anillo de barras (cabe en 192 dp, cuadrado y letra grande).
+    androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+      val rInt = (minOf(maxWidth, maxHeight) / 2 - Tokens.Espacio.bordeSeguro) * (1f - 0.32f)
+      // La línea de "pico" queda bajo el centro, donde la cuerda del anillo interior es más corta.
+      val ancho = rInt * 2 * 0.7f
+      Column(Modifier.width(ancho), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(stringResource(R.string.hora_eje, 0), style = Tipo.dato.copy(fontSize = 10.sp), color = colores.textoSecundario, maxLines = 1)
+        Spacer(Modifier.height(2.dp))
+        BasicText(
+          total, style = Tipo.cifra.copy(color = colores.texto), maxLines = 1,
+          autoSize = TextAutoSize.StepBased(minFontSize = 16.sp, maxFontSize = 26.sp),
+        )
+        BasicText(
+          stringResource(R.string.pasos_hoy), style = Tipo.dato.copy(color = colores.textoSecundario), maxLines = 1,
+          autoSize = TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = Tipo.dato.fontSize),
+        )
+        Spacer(Modifier.height(2.dp))
+        BasicText(
+          if (hayDatos) stringResource(R.string.pico_a_las, "%02d:00".format(pico)) else stringResource(R.string.sin_pasos_aun),
+          style = Tipo.etiqueta.copy(color = acento), maxLines = 1,
+          autoSize = TextAutoSize.StepBased(minFontSize = 8.sp, maxFontSize = 11.sp),
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(stringResource(R.string.hora_eje, 12), style = Tipo.dato.copy(fontSize = 10.sp), color = colores.textoSecundario, maxLines = 1)
+      }
     }
   }
 }
@@ -138,7 +154,7 @@ fun GraficaPasos(estado: EstadoBrasa, horaActual: Int = LocalTime.now().hour, fi
 fun GraficaPulso(estado: EstadoBrasa, fijo: Boolean = false) {
   val colores = BrasaTema.colores
   val acento = Tokens.paleta(Emocion.INQUIETA, colores.oscuro).acento
-  val calma = if (colores.oscuro) Tokens.Colores.Agua else Color(0xFF2B5D8A)
+  val calma = if (colores.oscuro) Tokens.Colores.Agua else Tokens.Colores.AguaClaroTema
   val entrada = rememberEntrada(fijo = fijo)
   val zona = ZoneId.systemDefault()
   val inicioDia = remember { LocalDate.now().atStartOfDay(zona).toInstant().toEpochMilli() }
@@ -150,8 +166,16 @@ fun GraficaPulso(estado: EstadoBrasa, fijo: Boolean = false) {
   val desc = if (maximo != null) stringResource(R.string.grafica_pulso_desc, reposo ?: 0, maximo) else stringResource(R.string.sin_pulso_aun)
 
   val medidor = rememberTextMeasurer()
-  if (muestras.size < 2) {
+  if (muestras.isEmpty()) {
     EstadoVacio(stringResource(R.string.pulso_hoy), stringResource(R.string.sin_pulso_aun), stringResource(R.string.sin_pulso_pista), Emocion.INQUIETA)
+    return
+  }
+  // Pocos datos reales (recién instalada o reloj recién puesto): una línea de 2 puntos no dice nada.
+  if (muestras.size < MIN_MUESTRAS_PULSO || muestras.last().ms - muestras.first().ms < MIN_TRAMO_PULSO_MS) {
+    EstadoVacio(
+      stringResource(R.string.pulso_hoy), stringResource(R.string.pulso_midiendo),
+      stringResource(R.string.pulso_midiendo_pista, muestras.last().bpm), Emocion.INQUIETA,
+    )
     return
   }
   FondoEmocion(Emocion.INQUIETA, intensidad = 0.45f) {
@@ -164,7 +188,9 @@ fun GraficaPulso(estado: EstadoBrasa, fijo: Boolean = false) {
       )
       Spacer(Modifier.height(6.dp))
       Canvas(Modifier.fillMaxWidth().weight(1f).semantics { contentDescription = desc }) {
-        val area = Rect(0f, 14.dp.toPx(), size.width, size.height - 16.dp.toPx())
+        // Margen lateral: abajo el círculo se estrecha; el eje y sus etiquetas quedan dentro.
+        val lado = MARGEN_EJE.toPx()
+        val area = Rect(lado, 14.dp.toPx(), size.width - lado, size.height - 16.dp.toPx())
         // Línea base y guía de reposo + 20 (umbral de tensión), discontinua.
         drawLine(colores.pista, Offset(area.left, area.bottom), Offset(area.right, area.bottom), strokeWidth = 1.dp.toPx())
         if (muestras.size < 2) return@Canvas
@@ -213,10 +239,10 @@ fun GraficaPulso(estado: EstadoBrasa, fijo: Boolean = false) {
         }
         // Eje: 0 h · 12 h · 24 h (texto en Compose abajo).
       }
-      Box(Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
-        Text("0 h", style = Tipo.dato, color = colores.textoSecundario, modifier = Modifier.align(Alignment.CenterStart))
-        Text("12 h", style = Tipo.dato, color = colores.textoSecundario, modifier = Modifier.align(Alignment.Center))
-        Text("24 h", style = Tipo.dato, color = colores.textoSecundario, modifier = Modifier.align(Alignment.CenterEnd))
+      Box(Modifier.fillMaxWidth().padding(horizontal = MARGEN_EJE)) {
+        Text(stringResource(R.string.hora_eje, 0), style = Tipo.dato, color = colores.textoSecundario, modifier = Modifier.align(Alignment.CenterStart))
+        Text(stringResource(R.string.hora_eje, 12), style = Tipo.dato, color = colores.textoSecundario, modifier = Modifier.align(Alignment.Center))
+        Text(stringResource(R.string.hora_eje, 24), style = Tipo.dato, color = colores.textoSecundario, modifier = Modifier.align(Alignment.CenterEnd))
       }
       Spacer(Modifier.height(6.dp))
       // Chip del evento de respiración (mismo color de "calma" que el marcador).
@@ -224,11 +250,15 @@ fun GraficaPulso(estado: EstadoBrasa, fijo: Boolean = false) {
       // Solo se destaca si el pulso bajó (no se presenta una subida como logro).
       if (bajada != null && bajada < 0) {
         Box(
-          Modifier.height(30.dp).clip(CircleShape).background(calma.copy(alpha = if (colores.oscuro) 0.16f else 0.12f))
+          Modifier.padding(horizontal = 10.dp).height(30.dp).clip(CircleShape).background(calma.copy(alpha = if (colores.oscuro) 0.16f else 0.12f))
             .padding(horizontal = 12.dp),
           contentAlignment = Alignment.Center,
         ) {
-          Text(stringResource(R.string.tras_respirar, "−${-bajada}"), style = Tipo.etiqueta.copy(fontSize = 12.sp), color = calma)
+          // Se ajusta al ancho disponible (fuente grande, pantalla pequeña) en lugar de cortarse.
+          BasicText(
+            stringResource(R.string.tras_respirar, "−${-bajada}"), style = Tipo.etiqueta.copy(color = calma), maxLines = 1,
+            autoSize = TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = 12.sp),
+          )
         }
       } else {
         // Mismo alto que el chip: el eje no se desplaza hacia el borde.
@@ -250,7 +280,7 @@ fun fraseMetaLocal(meta: Int, anterior: Int): String = when {
 }
 
 @Composable
-fun GraficaSemana(estado: EstadoBrasa, fraseMeta: String? = null, fijo: Boolean = false) {
+fun GraficaSemana(estado: EstadoBrasa, fraseMeta: String? = null, fijo: Boolean = false, hoy: LocalDate = LocalDate.now()) {
   val colores = BrasaTema.colores
   val acento = Tokens.paleta(Emocion.FELIZ, colores.oscuro).acento
   val entrada = rememberEntrada(fijo = fijo)
@@ -258,20 +288,24 @@ fun GraficaSemana(estado: EstadoBrasa, fraseMeta: String? = null, fijo: Boolean 
   // Siempre 7 huecos (los días sin registro quedan vacíos): la barra de hoy nunca ocupa todo el ancho.
   val previos = estado.historial.takeLast(6)
   val dias = List(6 - previos.size) { -1 } + previos + estado.pasos
-  val hoy = LocalDate.now()
   val etiquetas = dias.indices.map { i ->
     hoy.minusDays((dias.size - 1 - i).toLong()).dayOfWeek.getDisplayName(TextStyle.NARROW, locale)
   }
   val cumplidos = previos.count { it >= estado.meta }
   val metaTxt = remember(estado.meta, locale) { NumberFormat.getIntegerInstance(locale).format(estado.meta) }
-  val frase = fraseMeta ?: fraseMetaLocal(estado.meta, estado.metaAnterior)
+  // El primer día no hay cambio de meta que explicar: se explica qué irá apareciendo.
+  val frase = if (previos.isEmpty()) stringResource(R.string.primer_dia_pista) else fraseMeta ?: fraseMetaLocal(estado.meta, estado.metaAnterior)
   val desc = stringResource(R.string.grafica_semana_desc, cumplidos, estado.historial.takeLast(6).size, estado.meta)
 
   FondoEmocion(Emocion.FELIZ, intensidad = 0.5f) {
     TituloBorde(stringResource(R.string.semana))
     Column(Modifier.fillMaxSize().padding(horizontal = 30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
       Spacer(Modifier.height(40.dp))
-      Text(if (previos.isEmpty()) stringResource(R.string.primer_dia) else stringResource(R.string.dias_cumplidos, cumplidos, previos.size), style = Tipo.dato, color = colores.textoSecundario, maxLines = 1)
+      BasicText(
+        if (previos.isEmpty()) stringResource(R.string.primer_dia) else stringResource(R.string.dias_cumplidos, cumplidos, previos.size),
+        style = Tipo.dato.copy(color = colores.textoSecundario), maxLines = 1,
+        autoSize = TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = Tipo.dato.fontSize),
+      )
       Canvas(Modifier.fillMaxWidth().weight(1f).semantics { contentDescription = desc }) {
         val alto = size.height - 18.dp.toPx()
         val techo = (dias.maxOrNull() ?: 0).coerceAtLeast(estado.meta) * 1.12f
@@ -303,7 +337,7 @@ fun GraficaSemana(estado: EstadoBrasa, fraseMeta: String? = null, fijo: Boolean 
         }
         // Línea de meta adaptativa (discontinua, por delante de las barras).
         drawLine(
-          Tokens.Colores.Dorado.copy(alpha = if (colores.oscuro) 0.9f else 1f), Offset(0f, yMeta), Offset(size.width, yMeta),
+          if (colores.oscuro) Tokens.Colores.Dorado.copy(alpha = 0.9f) else Tokens.Colores.FuegoClaroTema, Offset(0f, yMeta), Offset(size.width, yMeta),
           strokeWidth = 1.5.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 6f)),
         )
       }
@@ -322,6 +356,11 @@ fun GraficaSemana(estado: EstadoBrasa, fraseMeta: String? = null, fijo: Boolean 
     }
   }
 }
+
+/** Con menos muestras o menos tramo, Pulso muestra "midiendo" en lugar de una línea sin sentido. */
+const val MIN_MUESTRAS_PULSO = 6
+const val MIN_TRAMO_PULSO_MS = 20 * 60_000L
+private val MARGEN_EJE = 12.dp
 
 /** Momento del día a partir de ms (para pruebas). */
 fun horaDeMs(ms: Long): Int = Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefault()).hour

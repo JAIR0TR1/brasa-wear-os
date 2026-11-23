@@ -33,6 +33,9 @@ export function personalidad(idioma: "es" | "en"): string {
   ].join("\n");
 }
 
+/** Máximo que cabe en 2 líneas de la frase de Brasa en el reloj más pequeño (192 dp). */
+export const MAX_CARACTERES = 56;
+
 const palabras = (t: string) => t.trim().split(/\s+/).filter(Boolean).length;
 
 /** Limpia la salida: sin emojis ni comillas, una sola línea. */
@@ -67,8 +70,8 @@ export async function generar<T extends z.ZodType>(
     const valido = esquema.safeParse(JSON.parse(r.text ?? ""));
     if (!valido.success) return null;
     // Límite de palabras: si se pasa, se descarta (mejor una frase local que una cortada).
-    // Debe caber en el reloj: si se pasa de palabras o de 64 caracteres, mejor la frase local que una cortada.
-    if (textosDe(valido.data).some((f) => palabras(f) > maxPalabras || f.length > 64)) return null;
+    // Debe caber en el reloj: si se pasa de palabras o de 56 caracteres, mejor la frase local que una cortada.
+    if (textosDe(valido.data).some((f) => palabras(f) > maxPalabras || f.length > MAX_CARACTERES)) return null;
     return valido.data;
   } catch (e) {
     // Sin datos personales en los logs: solo el tipo de fallo.

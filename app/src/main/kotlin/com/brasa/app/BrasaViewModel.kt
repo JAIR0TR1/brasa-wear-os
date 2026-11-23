@@ -289,8 +289,12 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   }
 }
 
-/** Modo demo: datos completos de ejemplo, sin servidor ni sensores; permite forzar emoción y etapa. */
-fun estadoDemo(a: Ajustes, f: Int, s: Boolean): EstadoBrasa {
+/**
+ * Modo demo: datos completos de ejemplo, sin servidor ni sensores; permite forzar emoción y etapa.
+ * El día de ejemplo solo llega hasta [minutoActual] (nunca pinta horas futuras). Todo lo que se ve
+ * en demo está marcado como tal en Ajustes ("Simulados (demo)").
+ */
+fun estadoDemo(a: Ajustes, f: Int, s: Boolean, minutoActual: Int = minutoDelDia()): EstadoBrasa {
   val meta = 8500
   val emocion = a.emocionDemo ?: Emocion.FELIZ
   val progreso = when (emocion) {
@@ -301,15 +305,18 @@ fun estadoDemo(a: Ajustes, f: Int, s: Boolean): EstadoBrasa {
   val nivel = if (a.etapaDemo != null) etapa.nivelMinimo + 2 else 7
   val xp = Reglas.xpParaNivel(nivel) + 40
   val pasos = (progreso * meta).toInt()
+  val pulsos = demoPulsos(minutoActual)
   return EstadoBrasa(
     emocion = emocion, etapa = etapa, nivel = nivel, xp = xp, progresoNivel = Reglas.progresoNivel(xp), racha = 4,
     pasos = pasos, meta = meta, metaAnterior = 8000, progreso = progreso,
-    pulso = if (emocion == Emocion.INQUIETA) 96 else 64, pulsoElevado = emocion == Emocion.INQUIETA,
+    pulso = if (emocion == Emocion.INQUIETA) 96 else pulsos.lastOrNull()?.bpm ?: 64, pulsoElevado = emocion == Emocion.INQUIETA,
     frase = f, saludando = s, fuente = Fuente.DEMO,
-    pasosPorHora = demoPasosPorHora(pasos), pulsos = demoPulsos(), respiros = demoRespiros(),
+    pasosPorHora = demoPasosPorHora(pasos, minutoActual / 60), pulsos = pulsos, respiros = demoRespiros(minutoActual),
     historial = listOf(7200, 9100, 5400, 8800, 9600, 4300),
   )
 }
+
+fun minutoDelDia(): Int = java.time.LocalTime.now().let { it.hour * 60 + it.minute }
 
 /** Día típico: pico al ir al trabajo, al mediodía y por la tarde. */
 fun demoPasosPorHora(total: Int, horaActual: Int = java.time.LocalTime.now().hour): List<Int> {
@@ -319,14 +326,29 @@ fun demoPasosPorHora(total: Int, horaActual: Int = java.time.LocalTime.now().hou
   return forma.map { (it / suma * total).toInt() }
 }
 
-private val inicioDemo = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+private fun inicioDemo() = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-/** Pulso de ejemplo: reposo ~62, subida al caminar y pico de tensión a las 16:20 que baja tras respirar. */
-fun demoPulsos(): List<Muestra> = (6 * 60 until 22 * 60 step 10).map { min ->
-  val h = min / 60f
-  val base = 62 + 8 * kotlin.math.sin(h * 0.9f) + if (h in 7.5f..8.5f || h in 18f..19f) 30 else 0
-  val tension = if (h in 15.9f..16.4f) 34 * (1 - kotlin.math.abs(h - 16.2f) / 0.35f).coerceAtLeast(0f) else 0f
-  Muestra(inicioDemo + min * 60_000L, (base + tension).toInt())
+/** Minuto del pico de tensión de ejemplo (16:10) y de la respiración que lo calma (16:25). */
+private const val MIN_TENSION = 16 * 60 + 10
+private const val MIN_RESPIRO = 16 * 60 + 25
+
+/**
+ * Pulso de ejemplo, una muestra cada 5 min desde las 00:00 hasta [minutoActual]: sueño ~54 lpm,
+ * reposo de día ~64, caminatas a las 8 y a las 18 (~95), pico de tensión en reposo a las 16:10
+ * que baja tras respirar. Variación pseudoaleatoria fija (siempre la misma curva).
+ */
+fun demoPulsos(minutoActual: Int = minutoDelDia()): List<Muestra> {
+  val inicio = inicioDemo()
+  val ruido = kotlin.random.Random(7)
+  return (0..minutoActual.coerceIn(0, 24 * 60 - 1) step 5).map { min ->
+    val h = min / 60f
+    val sueno = h < 6.5f || h > 23f
+    val base = if (sueno) 54f else 64f + 4f * kotlin.math.sin((h - 9f) * 0.5f)
+    val camina = if (h in 7.6f..8.4f || h in 18f..18.9f) 31f else 0f
+    val tension = if (min in MIN_TENSION - 20..MIN_RESPIRO) 30f * (1f - kotlin.math.abs(min - MIN_TENSION) / 25f).coerceAtLeast(0f) else 0f
+    Muestra(inicio + min * 60_000L, (base + camina + tension + ruido.nextInt(-3, 4)).toInt())
+  }
 }
 
-fun demoRespiros(): List<Respiro> = listOf(Respiro(inicioDemo + (16 * 60 + 25) * 60_000L, 96, 82))
+fun demoRespiros(minutoActual: Int = minutoDelDia()): List<Respiro> =
+  if (minutoActual < MIN_RESPIRO) emptyList() else listOf(Respiro(inicioDemo() + MIN_RESPIRO * 60_000L, 94, 78))

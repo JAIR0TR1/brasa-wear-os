@@ -27,6 +27,8 @@ object Tokens {
     val Mejilla = Color(0xFFFF6B8B)
     val Agua = Color(0xFFBFE3FF)
     val Blanco = Color(0xFFFFFFFF)
+    /** "Calma" (respiración) en tema claro: azul profundo, AA sobre el fondo claro. */
+    val AguaClaroTema = Color(0xFF2B5D8A)
 
     /** Tema claro: blanco cálido y acentos profundos (AA sobre el fondo). */
     val FondoClaro = Color(0xFFFFF8F0)
@@ -76,6 +78,8 @@ object Tokens {
     val xl = 24.dp
     /** Área táctil mínima (WCAG / Wear). */
     val tactil = 48.dp
+    /** Distancia mínima de cualquier trazo o brillo al borde de la pantalla. */
+    val bordeSeguro = 18.dp
   }
 
   /** Duraciones de movimiento (ms). */

@@ -92,7 +92,7 @@
   </string-array>
 
   <string name="permisos_titulo">Hi, I\'m Brasa</string>
-  <string name="permisos_texto">I read your steps and pulse to know how to help.</string>
+  <string name="permisos_texto">I read your steps and pulse to help you.</string>
   <string name="permitir">Allow</string>
   <string name="ahora_no">Not now</string>
   <string name="ajuste_permisos">Health sensors</string>
@@ -125,4 +125,8 @@
   <string name="etapa_maxima">You are a legend. No bigger fire.</string>
   <string name="sin_pulso_pista">Snug the watch on your wrist and I\'ll measure again.</string>
   <string name="primer_dia">Your first day with Brasa</string>
+  <string name="pulso_midiendo">Measuring your pulse</string>
+  <string name="pulso_midiendo_pista">You\'re at %1$d bpm. Your day shows up soon.</string>
+  <string name="primer_dia_pista">Each day adds a bar.</string>
+  <string name="hora_eje">%1$d h</string>
 </resources>

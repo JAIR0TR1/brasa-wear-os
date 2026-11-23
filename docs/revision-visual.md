@@ -104,3 +104,24 @@ Lo que ya funcionaba: el remolino de anillos opuestos del arranque, la respiraci
 | Evolución: última línea cortada en el borde | nada cortado | Margen lateral extra |
 
 **Resultado fase 4:** pasa. Lámina: `docs/capturas/lamina-fase4.png`; emulador: `docs/capturas/emulador/`.
+
+---
+
+## Versión 1.0.0 — revisión final (23-nov-2026)
+
+### Ronda 1 (Roborazzi, 6 variantes de todas las pantallas)
+| Problema | Criterio | Corrección |
+|---|---|---|
+| Capturas de Semana dependían del día real (letras de los días): verify fallaba cada día | pruebas fiables | `GraficaSemana(hoy = …)` y demo con minuto fijo en las capturas |
+| Pulso: "0 h" y "24 h" pegados al borde en pantallas pequeñas | nada cortado | Eje con margen lateral de 12 dp; las etiquetas se alinean con el área de datos |
+| Pulso con fuente grande: el chip "−16 lpm tras respirar" rozaba el círculo | nada cortado / fuente grande | Chip con margen y texto que se ajusta al ancho (autoSize 9–12 sp) |
+| Pasos: la barra más larga y su brillo llegaban al borde (y al indicador de páginas) | márgenes seguros | Token `bordeSeguro` (18 dp), barras 32 % del radio, brillo más corto |
+| Pasos en 192 dp / cuadrado / fuente grande: "pico a las 18:00" tocaba las barras | nada cortado | El centro se mide con el radio interior real del anillo y se ajusta (autoSize) |
+| Pulso en demo: curva fija de 6 a 22 h aunque fuera de mañana | coherencia demo | Demo cada 5 min de 00:00 hasta la hora actual (sueño, caminatas, pico de tensión 16:10, respiración 16:25 solo si ya pasó) |
+| Pulso con pocos datos reales: línea de 2 puntos sin sentido | estados vacíos | Estado "Midiendo tu pulso" con la última lectura (< 6 muestras o < 20 min) |
+| Semana el primer día: "Tu meta sigue igual" no explica nada y el encabezado se cortaba | estados vacíos / nada cortado | "Cada día suma una barra." y encabezado con autoSize |
+| Semana en tema claro: línea de meta dorada casi invisible | contraste | Línea con el fuego del tema claro |
+| Inicio: frases de una línea tocaban el anillo | nada cortado | Margen 24 dp; si no caben en 2 líneas se reducen (hasta 11 sp) en lugar de cortarse. El servidor acepta como mucho 56 caracteres |
+| Permisos en 192 dp / cuadrado / fuente grande: "Permitir" cortado abajo | acción principal visible | Brasa más compacta y texto más corto |
+
+**Resultado:** pasa en las 6 variantes. 121 pruebas (unitarias + capturas) en verde.
