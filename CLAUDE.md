@@ -65,7 +65,7 @@ Mejoras futuras (no hechas a propósito):
 - Plan gratuito: límite por minuto (429 al hacer ~40 llamadas seguidas). El reloj pide frases solo al cambiar de situación (caché + ≥ 20 s).
 - Frases ≤ 9 palabras pedidas, ≤ 12 palabras / 56 caracteres aceptadas (`MAX_CARACTERES`, 2 líneas en el reloj de 192 dp; además la app reduce la letra hasta 11 sp antes de cortar). El servidor pone mayúscula inicial.
 - La clave vive solo en `servidor/.env.local` (ignorado) y en Vercel (variable sensible de producción).
-- `vercel link` conectó el repositorio de GitHub al proyecto: los despliegues se hacen con `npx vercel deploy --prod` desde `servidor/`.
+- El proyecto de Vercel está vinculado al repo de GitHub, pero con los despliegues automáticos por git **desactivados**: un push o unir a `main` no despliega nada. Se despliega solo con `npx vercel deploy --prod` desde `servidor/` (Root Directory del proyecto = "."; si se pone "servidor", el despliegue por CLI falla).
 
 ## Dónde quedamos (23-nov-2026)
 Versión 1.0.0 terminada en la rama `mejoras-v1` (sin unir a `main`). 170 pruebas de la app + 17 del servidor en verde; servidor en producción; APK en `entrega/Brasa-1.0.0.apk` (debug: incluye el simulador adb para la demo).
