@@ -89,5 +89,6 @@ object Tokens {
     const val dibujo = 900
     const val transicionFondo = 600
     const val arranque = 2000
+    const val subidaNivel = 2600
   }
 }

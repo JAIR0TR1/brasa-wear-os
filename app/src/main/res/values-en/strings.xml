@@ -129,4 +129,7 @@
   <string name="pulso_midiendo_pista">You\'re at %1$d bpm. Your day shows up soon.</string>
   <string name="primer_dia_pista">Each day adds a bar.</string>
   <string name="hora_eje">%1$d h</string>
+  <string name="nivel_subido">Level %1$d!</string>
+  <string name="etapa_alcanzada">Now I\'m %1$s!</string>
+  <string name="nivel_subido_voz">My fire grows with you.</string>
 </resources>

@@ -93,6 +93,17 @@ object Reglas {
     return ((Math.round(limitada / 100.0) * 100).toInt()).coerceIn(META_MIN, META_MAX)
   }
 
+  // ---------- Celebraciones ----------
+
+  /** La meta se celebra una vez: al cruzar el 100 % (no cada vez que se recalcula estando por encima). */
+  fun cumplioMeta(progresoAntes: Float, progresoAhora: Float): Boolean = progresoAntes < 1f && progresoAhora >= 1f
+
+  fun subioDeNivel(nivelAntes: Int, nivelAhora: Int): Boolean = nivelAhora > nivelAntes
+
+  /** Etapa nueva alcanzada al subir de nivel (null si sigue en la misma). */
+  fun etapaNueva(nivelAntes: Int, nivelAhora: Int): Etapa? =
+    Etapa.deNivel(nivelAhora).takeIf { it != Etapa.deNivel(nivelAntes) && nivelAhora > nivelAntes }
+
   /** Racha: días consecutivos (desde el más reciente) en los que se alcanzó al menos el 60 % de la meta. */
   fun racha(historial: List<Int>, meta: Int): Int = historial.reversed().takeWhile { it >= meta * 0.6 }.count()
 }

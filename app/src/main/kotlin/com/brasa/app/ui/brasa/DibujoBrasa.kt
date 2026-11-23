@@ -435,7 +435,7 @@ private fun DrawScope.dibujarGota(c: Offset, radio: Float, alfa: Float) {
 }
 
 /** Estrella de cuatro puntas (chispa de celebración). */
-private fun DrawScope.dibujarEstrella(c: Offset, tam: Float, color: Color, alfa: Float) {
+internal fun DrawScope.dibujarEstrella(c: Offset, tam: Float, color: Color, alfa: Float) {
   val e = Path().apply {
     moveTo(c.x, c.y - tam)
     quadraticTo(c.x, c.y, c.x + tam, c.y)

@@ -69,6 +69,64 @@ class ReglasTest {
     assertEquals(2, Reglas.racha(listOf(9000, 1000, 6000, 7000), 8000))
     assertEquals(0, Reglas.racha(listOf(9000, 100), 8000))
   }
+
+  @Test fun emocionEnLosLimites() {
+    assertEquals(Emocion.APAGADA, Reglas.emocion(0.199f, false, 0))
+    assertEquals(Emocion.TRANQUILA, Reglas.emocion(0.2f, false, 0))
+    assertEquals(Emocion.FELIZ, Reglas.emocion(0.6f, false, 0))
+    assertEquals(Emocion.EUFORICA, Reglas.emocion(1f, false, 0))
+    // Meta cumplida pesa más que la inactividad; 179 min quieta aún no apaga.
+    assertEquals(Emocion.EUFORICA, Reglas.emocion(1f, false, 500))
+    assertEquals(Emocion.FELIZ, Reglas.emocion(0.7f, false, Reglas.MINUTOS_QUIETO_APAGADA - 1))
+  }
+
+  @Test fun xpYProgresoDentroDelNivel() {
+    assertEquals(0, Reglas.xpParaNivel(1))
+    assertEquals(400, Reglas.xpParaNivel(5))
+    assertEquals(0f, Reglas.progresoNivel(400))
+    assertEquals(0.5f, Reglas.progresoNivel(400 + (625 - 400) / 2), 0.01f)
+    assertEquals(1, Reglas.nivel(-50)) // nunca por debajo de 1
+    assertEquals(0, Reglas.xpPorPasos(99))
+  }
+
+  @Test fun metaAdaptativaBajaConLimite() {
+    // Media 4.000 × 1,05 = 4.200, pero desde 8.000 solo puede bajar un 15 % → 6.800.
+    assertEquals(6800, Reglas.metaAdaptativa(List(7) { 4_000 }, 8000))
+    // Los días sin datos (0) no cuentan; nunca pasa de 15.000.
+    assertEquals(15000, Reglas.metaAdaptativa(listOf(0, 0, 40_000), 14_000))
+  }
+
+  @Test fun tensionNecesitaDosLecturasRecientes() {
+    val ahora = 10_000_000L
+    // Una sola lectura alta, o lecturas altas pero viejas (> 3 min), no bastan.
+    assertFalse(Reglas.pulsoElevadoEnReposo(listOf(Muestra(ahora, 120)), 65, 0, ahora))
+    assertFalse(Reglas.pulsoElevadoEnReposo(listOf(Muestra(ahora - 400_000, 120), Muestra(ahora - 300_000, 120)), 65, 0, ahora))
+    // Justo en el umbral (base + 20) sí cuenta.
+    assertTrue(Reglas.pulsoElevadoEnReposo(listOf(Muestra(ahora - 60_000, 85), Muestra(ahora, 85)), 65, 0, ahora))
+  }
+
+  @Test fun metaSeCelebraUnaSolaVezAlCruzarEl100() {
+    assertTrue(Reglas.cumplioMeta(0.98f, 1.0f))
+    assertFalse(Reglas.cumplioMeta(1.0f, 1.2f)) // ya estaba cumplida
+    assertFalse(Reglas.cumplioMeta(0.5f, 0.9f))
+  }
+
+  @Test fun subidaDeNivelYEtapaNueva() {
+    assertTrue(Reglas.subioDeNivel(6, 7))
+    assertFalse(Reglas.subioDeNivel(7, 7))
+    assertFalse(Reglas.subioDeNivel(8, 7))
+    assertEquals(null, Reglas.etapaNueva(6, 7))
+    assertEquals(Etapa.FOGATA, Reglas.etapaNueva(9, 10))
+    assertEquals(Etapa.LEYENDA, Reglas.etapaNueva(12, 22))
+    assertEquals(null, Reglas.etapaNueva(12, 9)) // bajar no es una etapa nueva
+  }
+
+  @Test fun nivelesAgregadosQueSalenDelReloj() {
+    assertEquals(com.brasa.app.data.NivelActividad.BAJO, com.brasa.app.data.nivelDe(0.29f))
+    assertEquals(com.brasa.app.data.NivelActividad.MEDIO, com.brasa.app.data.nivelDe(0.3f))
+    assertEquals(com.brasa.app.data.NivelActividad.ALTO, com.brasa.app.data.nivelDe(0.8f))
+    assertEquals(com.brasa.app.data.NivelActividad.ALTO, com.brasa.app.data.nivelDe(3f))
+  }
 }
 
 class HistorialTest {

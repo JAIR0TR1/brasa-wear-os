@@ -32,6 +32,12 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
+/** Momento que merece celebrarse (vibración; la subida de nivel además tiene animación). */
+sealed interface Celebracion {
+  data object Meta : Celebracion
+  data class Nivel(val nivel: Int, val etapa: Etapa, val etapaNueva: Boolean) : Celebracion
+}
+
 /** De dónde salen los datos. */
 enum class Fuente { DEMO, SENSORES, MANUAL }
 
@@ -87,6 +93,9 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   private var dispositivo: String? = null
   private var ultimaPeticion = 0L
   private var reintento: kotlinx.coroutines.Job? = null
+  private val _celebraciones = kotlinx.coroutines.flow.MutableSharedFlow<Celebracion>(extraBufferCapacity = 4)
+  /** Meta cumplida y subidas de nivel ocurridas mientras la app está abierta. */
+  val celebraciones: kotlinx.coroutines.flow.SharedFlow<Celebracion> = _celebraciones
 
   /** true cuando hay que mostrar la pantalla que explica los permisos (solo la primera vez). */
   val pedirPermisos: StateFlow<Boolean> =
@@ -113,6 +122,22 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
     viewModelScope.launch { salud.eventos.collect(::aplicar) }
     // El saludo dura unos segundos; después Brasa habla según su emoción.
     viewModelScope.launch { delay(SALUDO_MS); saludando.value = false; situacion.value = situacionDe(estado.value.emocion); situacion.value?.let(::pedirFrase) }
+    // Celebraciones: solo cambios dentro de la misma fuente (activar o quitar el demo no es un logro)
+    // y después de cargar el registro (el estado inicial no cuenta).
+    viewModelScope.launch {
+      var previo: EstadoBrasa? = null
+      estado.collect { e ->
+        val p = previo
+        if (cargado.value) previo = e
+        if (p == null || !cargado.value || p.fuente != e.fuente) return@collect
+        if (Reglas.cumplioMeta(p.progreso, e.progreso)) _celebraciones.tryEmit(Celebracion.Meta)
+        if (Reglas.subioDeNivel(p.nivel, e.nivel)) {
+          _celebraciones.tryEmit(Celebracion.Nivel(e.nivel, e.etapa, Reglas.etapaNueva(p.nivel, e.nivel) != null))
+          situacion.value = Situacion.SUBIDA_NIVEL
+          pedirFrase(Situacion.SUBIDA_NIVEL, urgente = true)
+        }
+      }
+    }
     // Al cambiar de emoción, frase nueva (y deja de saludar).
     viewModelScope.launch {
       var anterior: Emocion? = null

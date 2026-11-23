@@ -32,6 +32,8 @@ import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import com.brasa.app.BrasaViewModel
+import com.brasa.app.Celebracion
+import com.brasa.app.ui.pantallas.SubidaNivel
 import com.brasa.app.data.permisosSalud
 import com.brasa.app.ui.pantallas.Permisos
 import com.brasa.app.ui.pantallas.AccionesAjustes
@@ -62,7 +64,18 @@ fun BrasaApp(vm: BrasaViewModel) {
   val pedir = { lanzador.launch(permisosSalud) }
   var arrancado by rememberSaveable { mutableStateOf(false) }
 
+  // Meta cumplida o subida de nivel: vibración de celebración; el nivel además tiene su animación.
+  var subida by remember { mutableStateOf<Celebracion.Nivel?>(null) }
+  val haptica = rememberHaptica()
+  LaunchedEffect(Unit) {
+    vm.celebraciones.collect { c ->
+      haptica.celebrar()
+      if (c is Celebracion.Nivel) subida = c
+    }
+  }
+
   BrasaTheme(oscuro = ajustes.oscuro) {
+   Box(Modifier.fillMaxSize()) {
     Crossfade(arrancado, animationSpec = tween(Tokens.Duracion.media), label = "arranque") { listo ->
       if (!listo) {
         Arranque(onFin = { arrancado = true })
@@ -128,5 +141,7 @@ fun BrasaApp(vm: BrasaViewModel) {
         }
       }
     }
+    subida?.let { SubidaNivel(it.nivel, it.etapa, it.etapaNueva, onFin = { subida = null }) }
+   }
   }
 }
