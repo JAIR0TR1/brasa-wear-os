@@ -48,8 +48,11 @@ export const MAX_CARACTERES = 56;
 const palabras = (t: string) => t.trim().split(/\s+/).filter(Boolean).length;
 
 /** Limpia la salida: sin emojis ni comillas, una sola línea. */
-export const limpiar = (t: string) =>
-  t.replace(/[\p{Extended_Pictographic}\u{FE0F}]/gu, "").replace(/["“”«»]/g, "").replace(/\s+/g, " ").trim();
+export const limpiar = (t: string) => {
+  const l = t.replace(/[\p{Extended_Pictographic}\u{FE0F}]/gu, "").replace(/["“”«»]/g, "").replace(/\s+/g, " ").trim();
+  // Mayúscula inicial (también tras ¡ o ¿).
+  return l.replace(/^([¡¿]?)(\p{Ll})/u, (_, signo: string, letra: string) => signo + letra.toUpperCase());
+};
 
 /**
  * Pide a Gemini un JSON que cumpla [esquema]. Si no hay clave, tarda más de 7 s, falla o la salida

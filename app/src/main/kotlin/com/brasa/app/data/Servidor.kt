@@ -34,6 +34,7 @@ fun nivelDe(progreso: Float) = when {
  * cualquier fallo devuelve null y la app usa sus frases locales.
  */
 class ClienteServidor(private val base: String = BuildConfig.SERVER_URL.trimEnd('/')) {
+  private companion object { const val TAG = "BrasaServidor" }
   val configurado get() = base.startsWith("http")
 
   suspend fun mensaje(
@@ -78,11 +79,14 @@ class ClienteServidor(private val base: String = BuildConfig.SERVER_URL.trimEnd(
         setRequestProperty("content-type", "application/json")
       }
       conexion.outputStream.use { it.write(cuerpo.toString().toByteArray()) }
-      if (conexion.responseCode !in 200..299) return@withContext null
+      if (conexion.responseCode !in 200..299) { Log.i(TAG, "$ruta http ${conexion.responseCode}"); return@withContext null }
       val texto = conexion.inputStream.bufferedReader().use { it.readText() }
-      Json.parseToJsonElement(texto).jsonObject
+      Json.parseToJsonElement(texto).jsonObject.also {
+        // Solo la ruta y el origen (ia/local): ni la frase ni datos del usuario.
+        Log.i(TAG, "$ruta ok origen=${it["origen"]?.jsonPrimitive?.content}")
+      }
     } catch (e: Exception) {
-      Log.i("BrasaServidor", "sin servidor: ${e.javaClass.simpleName}") // sin datos
+      Log.i(TAG, "sin servidor: ${e.javaClass.simpleName}") // sin datos
       null
     } finally {
       conexion?.disconnect()

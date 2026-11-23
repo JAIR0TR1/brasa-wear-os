@@ -111,6 +111,11 @@ describe("Gemini simulado", () => {
     assert.equal(j.frase, "Vamos a brillar");
   });
 
+  test("pone mayúscula inicial (también tras ¡)", async () => {
+    simular(JSON.stringify({ frase: "¡enciende tu chispa!" }));
+    assert.equal((await (await mensaje(post("/api/mensaje", valido()))).json()).frase, "¡Enciende tu chispa!");
+  });
+
   test("descarta frases que no caben en el reloj y usa el respaldo", async () => {
     simular(JSON.stringify({ frase: "a".repeat(MAX_CARACTERES + 1) }));
     const j = await (await mensaje(post("/api/mensaje", valido()))).json();

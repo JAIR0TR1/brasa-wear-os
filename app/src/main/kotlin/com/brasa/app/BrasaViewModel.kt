@@ -86,6 +86,7 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   private val frasesMeta = MutableStateFlow<Map<String, String>>(emptyMap())
   private var dispositivo: String? = null
   private var ultimaPeticion = 0L
+  private var reintento: kotlinx.coroutines.Job? = null
 
   /** true cuando hay que mostrar la pantalla que explica los permisos (solo la primera vez). */
   val pedirPermisos: StateFlow<Boolean> =
@@ -256,7 +257,13 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
     val clave = "${idioma()}:${s.api}"
     if (clave in frasesIa.value) return
     val t = System.currentTimeMillis()
-    if (!urgente && t - ultimaPeticion < 20_000) return
+    val espera = ESPERA_ENTRE_PETICIONES_MS - (t - ultimaPeticion)
+    if (!urgente && espera > 0) {
+      // Dentro de la ventana de 20 s: se reintenta al cumplirse si Brasa sigue en la misma situación.
+      reintento?.cancel()
+      reintento = viewModelScope.launch { delay(espera); if (situacion.value == s) pedirFrase(s) }
+      return
+    }
     ultimaPeticion = t
     val e = estado.value
     viewModelScope.launch {
@@ -286,6 +293,8 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   companion object {
     const val PASOS_POR_TOQUE = 250
     const val SALUDO_MS = 6000L
+    /** Cuota gratuita de Gemini: como mucho una frase cada 20 s por reloj. */
+    const val ESPERA_ENTRE_PETICIONES_MS = 20_000L
   }
 }
 
