@@ -114,7 +114,7 @@
   <string name="dias_cumplidos">%1$d of %2$d days reached</string>
   <string name="grafica_semana_desc">Week: %1$d of %2$d days at the %3$d step goal</string>
   <string name="meta_valor">goal %1$s</string>
-  <string name="meta_sube">Goal up: great week.</string>
+  <string name="meta_sube">Your goal is up: great week!</string>
   <string name="meta_baja">Goal down so you can reach it.</string>
   <string name="meta_igual">Goal stays: nice rhythm.</string>
   <string name="evolucion">Evolution</string>

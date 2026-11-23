@@ -83,7 +83,7 @@ class InterfazTest {
     var toques = 0
     var respirar = 0
     compose.setContent {
-      BrasaTheme { Inicio(estadoDe(Emocion.INQUIETA), onTocarBrasa = { toques++ }, onRespirar = { respirar++ }, entrada = false, tiempoFijo = 1f, hora = "10:42") }
+      BrasaTheme { Inicio(estadoDe(Emocion.INQUIETA), onTocarBrasa = { toques++ }, onRespirar = { respirar++ }, entrada = false, tiempoFijo = 1f, hora = HORA_TEXTO_CAPTURAS) }
     }
     compose.onNode(hasContentDescription("Brasa, inquieta", substring = true)).performClick()
     assertEquals(1, toques)
@@ -92,7 +92,7 @@ class InterfazTest {
   }
 
   @Test fun inicioSinTensionNoMuestraRespirar() {
-    compose.setContent { BrasaTheme { Inicio(estadoDe(Emocion.FELIZ), {}, {}, entrada = false, tiempoFijo = 1f, hora = "10:42") } }
+    compose.setContent { BrasaTheme { Inicio(estadoDe(Emocion.FELIZ), {}, {}, entrada = false, tiempoFijo = 1f, hora = HORA_TEXTO_CAPTURAS) } }
     compose.onNodeWithText("Respirar").assertDoesNotExist()
   }
 

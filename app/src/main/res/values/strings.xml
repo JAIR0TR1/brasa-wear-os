@@ -115,7 +115,7 @@
   <string name="dias_cumplidos">%1$d de %2$d días cumplidos</string>
   <string name="grafica_semana_desc">Semana: %1$d de %2$d días con la meta de %3$d pasos</string>
   <string name="meta_valor">meta %1$s</string>
-  <string name="meta_sube">Subí tu meta: gran semana.</string>
+  <string name="meta_sube">Tu meta sube: ¡gran semana!</string>
   <string name="meta_baja">Bajé tu meta para que llegues.</string>
   <string name="meta_igual">Tu meta sigue igual: buen ritmo.</string>
   <string name="evolucion">Evolución</string>

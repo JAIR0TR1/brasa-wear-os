@@ -54,11 +54,11 @@ fun ContenidoFase2(nombre: String) {
       val p = mapOf("1" to 0.12f, "2" to 0.5f, "3" to 0.78f, "4" to 0.9f)[nombre.substringAfter("arranque-").take(1)]!!
       Canvas(Modifier.fillMaxSize().background(Color.Black)) { dibujarArranque(p) }
     }
-    nombre == "inicio-manual" -> Inicio(estadoDe(Emocion.APAGADA).copy(pasos = 0, progreso = 0f, fuente = Fuente.MANUAL), {}, {}, entrada = false, tiempoFijo = 1.3f, hora = "09:30")
-    nombre == "inicio-saludo" -> Inicio(estadoDe(Emocion.FELIZ).copy(saludando = true), {}, {}, entrada = false, tiempoFijo = 1.3f, hora = "08:15")
+    nombre == "inicio-manual" -> Inicio(estadoDe(Emocion.APAGADA).copy(pasos = 0, progreso = 0f, fuente = Fuente.MANUAL), {}, {}, entrada = false, tiempoFijo = 1.3f, hora = HORA_TEXTO_CAPTURAS)
+    nombre == "inicio-saludo" -> Inicio(estadoDe(Emocion.FELIZ).copy(saludando = true, frase = 1), {}, {}, entrada = false, tiempoFijo = 1.3f, hora = HORA_TEXTO_CAPTURAS)
     nombre.startsWith("inicio-") -> Box(Modifier.fillMaxSize()) {
       val e = Emocion.valueOf(nombre.substringAfter("inicio-").uppercase())
-      Inicio(estadoDe(e), {}, {}, entrada = false, tiempoFijo = 1.3f, hora = "10:42")
+      Inicio(estadoDe(e), {}, {}, entrada = false, tiempoFijo = 1.3f, hora = HORA_TEXTO_CAPTURAS)
       IndicadorPaginas(total = 2, actual = 0)
     }
     nombre == "respirar-inhala" -> Respirar(Etapa.LLAMA, 96, { it - 14 }, { _, _ -> }, {}, faseFija = FaseRespiro.INHALA, tiempoFijo = 1.3f)

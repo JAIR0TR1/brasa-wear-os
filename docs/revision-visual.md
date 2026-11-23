@@ -138,3 +138,11 @@ Lo que ya funcionaba: el remolino de anillos opuestos del arranque, la respiraci
 | Simulador de pulso: lecturas con fecha hacia atrás quedaban desordenadas | Lecturas ordenadas y una por minuto (`agregarPulso`, con prueba) |
 
 **Resultado:** pasa. Capturas en `docs/capturas/emulador/v1/`.
+
+### Ronda 3 (coherencia de las capturas)
+| Problema | Criterio | Corrección |
+|---|---|---|
+| La hora de Inicio (10:42) no coincidía con los datos de las gráficas (pico a las 18:00, pulso hasta las 20 h) | coherencia demo | Hora única de capturas 18:30 (`HORA_TEXTO_CAPTURAS`, `MINUTO_CAPTURAS`): datos demo solo hasta esa hora; el saludo de tarde usa "Hola, aquí sigo ardiendo." |
+| "Subí tu meta: gran semana." se podía leer ambigua | textos claros | "Tu meta sube: ¡gran semana!" / "Your goal is up: great week!" (≤ 2 líneas en las 6 variantes) |
+
+**Resultado:** pasa; `docs/screenshots/` regenerado.

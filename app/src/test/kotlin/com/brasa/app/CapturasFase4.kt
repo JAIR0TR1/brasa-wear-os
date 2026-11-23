@@ -36,7 +36,10 @@ val pantallasFase4 = listOf(
 
 /** Fecha y hora fijas: las capturas no pueden depender del día en que se ejecutan. */
 val HOY_CAPTURAS: java.time.LocalDate = java.time.LocalDate.of(2026, 11, 4)
-const val MINUTO_CAPTURAS = 20 * 60
+/** 18:30: la hora que se ve en Inicio y el límite de los datos demo de las gráficas coinciden. */
+const val MINUTO_CAPTURAS = 18 * 60 + 30
+const val HORA_CAPTURAS = MINUTO_CAPTURAS / 60
+const val HORA_TEXTO_CAPTURAS = "18:30"
 
 @Composable
 fun ContenidoFase4(nombre: String) {
@@ -47,7 +50,7 @@ fun ContenidoFase4(nombre: String) {
   }
   Box(Modifier.fillMaxSize()) {
     when (nombre) {
-      "grafica-pasos" -> GraficaPasos(demo.copy(pasosPorHora = demoPasosPorHora(demo.pasos, 20)), horaActual = 20, fijo = true)
+      "grafica-pasos" -> GraficaPasos(demo.copy(pasosPorHora = demoPasosPorHora(demo.pasos, HORA_CAPTURAS)), horaActual = HORA_CAPTURAS, fijo = true)
       "grafica-pulso" -> GraficaPulso(demo, fijo = true)
       "grafica-semana" -> GraficaSemana(demo, fijo = true, hoy = HOY_CAPTURAS)
       "grafica-semana-primer-dia" -> GraficaSemana(demo.copy(historial = emptyList(), pasos = 2300, meta = 6000, metaAnterior = 6000), fijo = true, hoy = HOY_CAPTURAS)

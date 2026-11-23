@@ -47,13 +47,13 @@ class AccesibilidadTest {
   private val demo = estadoDemo(Ajustes(demo = true), 0, false, MINUTO_CAPTURAS)
 
   private val pantallas: Map<String, @Composable () -> Unit> = mapOf(
-    "inicio-inquieta" to { Inicio(estadoDe(Emocion.INQUIETA), {}, {}, entrada = false, tiempoFijo = 1f, hora = "10:42") },
-    "inicio-manual" to { Inicio(estadoDe(Emocion.APAGADA).copy(pasos = 0, progreso = 0f, fuente = Fuente.MANUAL), {}, {}, entrada = false, tiempoFijo = 1f, hora = "10:42") },
+    "inicio-inquieta" to { Inicio(estadoDe(Emocion.INQUIETA), {}, {}, entrada = false, tiempoFijo = 1f, hora = HORA_TEXTO_CAPTURAS) },
+    "inicio-manual" to { Inicio(estadoDe(Emocion.APAGADA).copy(pasos = 0, progreso = 0f, fuente = Fuente.MANUAL), {}, {}, entrada = false, tiempoFijo = 1f, hora = HORA_TEXTO_CAPTURAS) },
     "permisos" to { Permisos({}, {}, tiempoFijo = 1f) },
     "ajustes" to { AjustesPantalla(Ajustes(demo = true), AccionesAjustes({}, {}, {}, {}), idiomaActual = "es") },
     "respirar" to { Respirar(Etapa.LLAMA, 96, { it - 14 }, { _, _ -> }, {}, faseFija = FaseRespiro.INHALA, tiempoFijo = 1f) },
     "resultado" to { Respirar(Etapa.LLAMA, 96, { it - 14 }, { _, _ -> }, {}, faseFija = FaseRespiro.FIN, tiempoFijo = 1f) },
-    "pasos" to { GraficaPasos(demo, horaActual = 20, fijo = true) },
+    "pasos" to { GraficaPasos(demo, horaActual = HORA_CAPTURAS, fijo = true) },
     "pulso" to { GraficaPulso(demo, fijo = true) },
     "semana" to { GraficaSemana(demo, fijo = true, hoy = HOY_CAPTURAS) },
     "evolucion" to { Evolucion(demo, tiempoFijo = 1f) },
