@@ -190,3 +190,12 @@ class DemoTest {
     assertEquals(1, demoRespiros(20 * 60).size)
   }
 }
+
+class PulsoTest {
+  @Test fun unaLecturaPorMinutoYOrdenadas() {
+    var p = emptyList<com.brasa.app.domain.Muestra>()
+    for ((ms, bpm) in listOf(200_000L to 70, 60_000L to 65, 230_000L to 72, 400_000L to 80)) p = agregarPulso(p, com.brasa.app.domain.Muestra(ms, bpm))
+    assertEquals(listOf(60_000L, 230_000L, 400_000L), p.map { it.ms }) // 200 s y 230 s caen en el mismo minuto
+    assertEquals(72, p[1].bpm) // la más nueva sustituye
+  }
+}

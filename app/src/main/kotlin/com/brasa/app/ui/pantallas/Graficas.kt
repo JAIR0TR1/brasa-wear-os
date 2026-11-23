@@ -175,7 +175,7 @@ fun GraficaPulso(estado: EstadoBrasa, fijo: Boolean = false) {
   if (muestras.size < MIN_MUESTRAS_PULSO || muestras.last().ms - muestras.first().ms < MIN_TRAMO_PULSO_MS) {
     EstadoVacio(
       stringResource(R.string.pulso_hoy), stringResource(R.string.pulso_midiendo),
-      stringResource(R.string.pulso_midiendo_pista, muestras.last().bpm), Emocion.INQUIETA,
+      stringResource(R.string.pulso_midiendo_pista, muestras.maxBy { it.ms }.bpm), Emocion.INQUIETA,
     )
     return
   }

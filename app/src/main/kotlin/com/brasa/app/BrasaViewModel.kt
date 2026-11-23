@@ -191,12 +191,7 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
             ultimoMovimientoMs = if (delta >= 15) t else d.ultimoMovimientoMs,
           )
         }
-        is EventoSalud.Pulso -> {
-          val ultima = d.pulsos.lastOrNull()
-          val pulsos = if (ultima != null && e.ms - ultima.ms < 60_000) d.pulsos.dropLast(1) + Muestra(e.ms, e.bpm)
-          else d.pulsos + Muestra(e.ms, e.bpm)
-          d.copy(pulsos = pulsos.takeLast(24 * 60))
-        }
+        is EventoSalud.Pulso -> d.copy(pulsos = agregarPulso(d.pulsos, Muestra(e.ms, e.bpm)))
       }
       r.copy(hoy = nuevo)
     }
@@ -328,6 +323,13 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
     const val ESPERA_ENTRE_PETICIONES_MS = 20_000L
   }
 }
+
+/**
+ * Añade una lectura de pulso: como mucho una por minuto (la nueva sustituye a la de ese minuto),
+ * siempre ordenadas por hora aunque lleguen desordenadas (lotes de Health Services o el simulador).
+ */
+fun agregarPulso(pulsos: List<Muestra>, m: Muestra): List<Muestra> =
+  (pulsos.filterNot { kotlin.math.abs(it.ms - m.ms) < 60_000 } + m).sortedBy { it.ms }.takeLast(24 * 60)
 
 /**
  * Modo demo: datos completos de ejemplo, sin servidor ni sensores; permite forzar emoción y etapa.
