@@ -125,3 +125,16 @@ Lo que ya funcionaba: el remolino de anillos opuestos del arranque, la respiraci
 | Permisos en 192 dp / cuadrado / fuente grande: "Permitir" cortado abajo | acción principal visible | Brasa más compacta y texto más corto |
 
 **Resultado:** pasa en las 6 variantes. 121 pruebas (unitarias + capturas) en verde.
+
+### Ronda 2 (emulador Wear OS 5, API 34: demo, simulador, Vercel y sin internet)
+| Hallazgo | Corrección |
+|---|---|
+| La frase de "inactividad" nunca se pedía a la IA: caía dentro de la ventana de 20 s del saludo y no se reintentaba | Reintento al cumplirse la ventana si la situación sigue igual |
+| Gemini a veces empezaba la frase en minúscula | El servidor pone mayúscula inicial (también tras ¡ y ¿) |
+| Pulso en un día tranquilo: la línea de umbral (reposo + 20) se dibujaba encima del texto | El rango vertical siempre incluye el umbral |
+| Tras respirar, el cambio de emoción borraba al instante la frase de reconocimiento | Se mantiene un minuto |
+| Demo: la explicación de la meta venía de la IA con la meta real (incoherente con la meta demo) | En demo se usa la frase local |
+| Semana en tema claro: frase larga de la IA cortada con "…" | autoSize (10–13 sp) y margen de 12 dp |
+| Simulador de pulso: lecturas con fecha hacia atrás quedaban desordenadas | Lecturas ordenadas y una por minuto (`agregarPulso`, con prueba) |
+
+**Resultado:** pasa. Capturas en `docs/capturas/emulador/v1/`.

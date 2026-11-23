@@ -1,9 +1,9 @@
 # Brasa — guía del proyecto
 
-App de Wear OS (Kotlin + Compose for Wear OS) con una mascota de fuego que lee pasos y pulso y decide si moverte, calmarte o descansar. Proyecto académico de **Diseño de Interfaces** (entrega 8-nov-2026). **El diseño pesa más que la cantidad de funciones.**
+**Versión 1.0.0** (versionCode 2). App de Wear OS (Kotlin + Compose for Wear OS) con una mascota de fuego que lee pasos y pulso y decide si moverte, calmarte o descansar. Proyecto académico de **Diseño de Interfaces** (entrega 8-nov-2026). **El diseño pesa más que la cantidad de funciones.**
 
 ## Reglas
-- Standalone (`com.google.android.wearable.standalone=true`). minSdk 30, compile/targetSdk 36.
+- Standalone (`com.google.android.wearable.standalone=true`). minSdk 30, targetSdk 36, compileSdk 37.
 - **Prohibido `Modifier.blur`**: todos los brillos con degradados radiales.
 - Todo color, tipo, espacio y duración sale de `app/src/main/kotlin/com/brasa/app/ui/theme/Tokens.kt`.
 - Prohibido: Material por defecto sin personalizar, fondos grises, tarjetas planas, emojis, texto cortado en el borde.
@@ -21,8 +21,8 @@ App de Wear OS (Kotlin + Compose for Wear OS) con una mascota de fuego que lee p
 - Compilar: `./gradlew :app:assembleDebug` (**sin `-q`**: con `-q` + configuration cache se instaló un APK viejo).
 - Emulador: `emulator -avd Brasa_Wear_Redondo`; app en español: `adb shell cmd locale set-app-locales com.brasa.app --locales es`. En Git Bash usar `MSYS_NO_PATHCONV=1` con rutas `/sdcard`. Capturas: `./gradlew :app:recordRoborazziDebug` → `docs/capturas/roborazzi/`.
 
-## Versiones verificadas (Google Maven / Maven Central, nov-2026)
-AGP 9.0.1 · Gradle 9.1.0 · Kotlin 2.3.20 · Compose BOM 2026.03.01 · Wear Compose 1.7.1 · Health Services 1.1.0 · DataStore 1.3.0 · AppCompat 1.8.0 · kotlinx.serialization 1.12.0 · Roborazzi 1.77.0 · Robolectric 4.17.
+## Versiones en uso (las del repositorio, nov-2026)
+AGP 9.1.1 · Gradle 9.3.1 · Kotlin 2.3.20 · Compose BOM 2026.03.01 · Wear Compose 1.7.1 · Health Services 1.1.0 · DataStore 1.3.0 · AppCompat 1.8.0 · kotlinx.serialization 1.12.0 · Roborazzi 1.77.0 · Robolectric 4.17.
 
 ## Permisos de salud (verificado en docs oficiales)
 - Pasos: `ACTIVITY_RECOGNITION`.
@@ -36,37 +36,40 @@ app/src/main/kotlin/com/brasa/app/
   ui/theme/    Tokens.kt, Tipografia.kt, BrasaTheme.kt
   ui/brasa/    Emocion.kt, Etapa.kt, Pose.kt, DibujoBrasa.kt, Brasa.kt (composable animado)
   ui/pantallas/ galería (prueba), arranque, inicio, respirar, gráficas, evolución, ajustes
-  domain/      reglas puras (emoción, tensión, XP, meta) con tests
+  domain/      reglas puras (emoción, tensión, XP, meta, celebraciones) con tests
   data/        Health Services, DataStore, cliente HTTP, frases locales
-servidor/      TypeScript + Vercel + Zod + Gemini Flash-Lite
+servidor/      TypeScript + Vercel + Zod + Gemini Flash-Lite (pruebas en servidor/pruebas, `npm test`)
 ```
+- DataStore "brasa" (solo en el reloj, fuera de la copia): registro del día con pasos/pulso, historial e id anónimo.
+- DataStore "brasa_respaldo" (Auto Backup, `res/xml/reglas_extraccion.xml` y `respaldo_completo.xml`): ajustes, XP total, respiraciones y meta.
 
 ## Fases (estado)
-- [x] 0 Entorno, git, proyecto (emulador creado; falta driver AEHD como admin)
+- [x] 0 Entorno, git, proyecto
 - [x] 1 Dirección de arte, tokens, Brasa + 5 emociones + galería, revisión visual
 - [x] 2 Arranque, inicio, respirar, ajustes y navegación (es/en, oscuro/claro)
 - [x] 3 Health Services (callback pasivo), reglas y tests, permisos, modo manual, simulador adb
 - [x] 4 Gráficas (pasos radial, pulso, semana) y evolución; probado en emulador
-- [~] 5 Servidor TS + Gemini `gemini-3.5-flash-lite` funcionando en local (`npm run dev`, emulador → http://10.0.2.2:3000); reloj conectado (UUID anónimo, solo niveles). **Falta: desplegar en Vercel** y almacenamiento persistente (Upstash).
-- [ ] 6 P1, pulido, accesibilidad
-- [ ] 7 README, justificación, QA
+- [x] 5 Servidor desplegado en Vercel: https://brasa-servidor.vercel.app (proyecto `brasa-servidor`, `GEMINI_API_KEY` como variable sensible de producción). Reloj conectado (UUID anónimo, solo niveles).
+- [x] 6 Háptica de celebración, animación de subida de nivel, copia de seguridad (Auto Backup), accesibilidad (TalkBack, 48 dp, AA) y pulido
+- [x] 7 README, docs/justificacion-diseno.md, docs/QA.md, docs/portafolio.md, docs/demo-profesor.md, docs/screenshots/
+
+Mejoras futuras (no hechas a propósito):
+- **Upstash Redis** para `/api/brasa/{dispositivo}` y el límite de peticiones (hoy en memoria por instancia de Vercel).
+- Resumen del día con IA en el reloj (el servidor ya tiene `/api/resumen`).
+- Datos con la app cerrada (`PassiveListenerService` + `READ_HEALTH_DATA_IN_BACKGROUND`).
+- Tile de Wear OS.
 
 ## Gemini (verificado nov-2026)
 - SDK `@google/genai` 2.32.0, `ai.models.generateContent` con `responseMimeType` + `responseJsonSchema` (de `z.toJSONSchema`).
 - La API rechaza `httpOptions.timeout` < 10 s → se usa `abortSignal` a 7 s. Latencia medida ≈ 1 s.
 - Plan gratuito: límite por minuto (429 al hacer ~40 llamadas seguidas). El reloj pide frases solo al cambiar de situación (caché + ≥ 20 s).
-- Frases ≤ 9 palabras pedidas, ≤ 12 palabras / 64 caracteres aceptadas (2 líneas del reloj).
-- La clave vive solo en `servidor/.env.local` (ignorado) y, al desplegar, en Vercel.
+- Frases ≤ 9 palabras pedidas, ≤ 12 palabras / 56 caracteres aceptadas (`MAX_CARACTERES`, 2 líneas en el reloj de 192 dp; además la app reduce la letra hasta 11 sp antes de cortar). El servidor pone mayúscula inicial.
+- La clave vive solo en `servidor/.env.local` (ignorado) y en Vercel (variable sensible de producción).
+- `vercel link` conectó el repositorio de GitHub al proyecto: los despliegues se hacen con `npx vercel deploy --prod` desde `servidor/`.
 
-## Dónde quedamos (4-nov-2026) y siguientes pasos
-Hecho: fases 0–4 completas y probadas en emulador; fase 5 a medias (servidor + Gemini funcionando en local, reloj conectado).
-Siguiente, en orden:
-1. **Desplegar `servidor/` en Vercel** (el usuario inicia sesión en Vercel y pega `GEMINI_API_KEY` en Settings → Environment Variables). Luego `SERVER_URL=https://<proyecto>.vercel.app` en `local.properties`.
-2. (Opcional) Upstash Redis para `/api/brasa/{dispositivo}`; hoy en memoria.
-3. Fase 6: P1 pendiente (háptica de celebración al cumplir meta y al subir de nivel, animación de subida de nivel, resumen del día con IA por la noche), pulido de movimiento, accesibilidad, revisión visual final.
-4. Fase 7: README, docs/justificacion-diseno.md (Nielsen, Gestalt, Fitts, WCAG), docs/QA.md.
-5. P2 (si sobra tiempo): tile de Wear OS.
-Pendiente del usuario: rotar la clave de Gemini tras la entrega (se compartió por chat).
+## Dónde quedamos (23-nov-2026)
+Versión 1.0.0 terminada en la rama `mejoras-v1` (sin unir a `main`). 170 pruebas de la app + 17 del servidor en verde; servidor en producción; APK en `entrega/Brasa-1.0.0.apk` (debug: incluye el simulador adb para la demo).
+Pendiente del usuario: probar en un reloj real, TalkBack y fuente grande (ver docs/QA.md ⬜), decidir si se une `mejoras-v1` a `main`, y rotar la clave de Gemini después de la entrega.
 
 ## Cómo retomar
 - Abrir la carpeta `C:\dev\brasa` en VS Code y abrir Claude Code ahí.
