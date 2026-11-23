@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
@@ -76,7 +78,10 @@ fun AjustesPantalla(
       contentPadding = PaddingValues(start = 14.dp, end = 14.dp, top = 30.dp, bottom = 44.dp),
     ) {
       item {
-        Text(stringResource(R.string.ajustes), style = Tipo.titulo, color = colores.texto, modifier = Modifier.padding(bottom = Tokens.Espacio.xs))
+        Text(
+          stringResource(R.string.ajustes), style = Tipo.titulo, color = colores.texto,
+          modifier = Modifier.padding(bottom = Tokens.Espacio.xs).semantics { heading() },
+        )
       }
       item {
         FilaAjuste(

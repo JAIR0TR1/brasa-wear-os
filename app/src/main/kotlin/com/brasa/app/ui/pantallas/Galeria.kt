@@ -1,5 +1,8 @@
 package com.brasa.app.ui.pantallas
 
+import androidx.compose.ui.semantics.traversalIndex
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -114,7 +117,8 @@ fun ContenidoGaleria(pagina: PaginaGaleria, tiempoFijo: Float? = null) {
 @Composable
 fun IndicadorPaginas(total: Int, actual: Int) {
   val colores = BrasaTema.colores
-  Canvas(Modifier.fillMaxSize()) {
+  val desc = androidx.compose.ui.res.stringResource(com.brasa.app.R.string.pagina_de, actual + 1, total)
+  Canvas(Modifier.fillMaxSize().semantics { contentDescription = desc; traversalIndex = 2f }) {
     val radio = size.minDimension / 2f - 7.dp.toPx()
     val paso = 5.5f
     val inicio = 90f + paso * (total - 1) / 2f

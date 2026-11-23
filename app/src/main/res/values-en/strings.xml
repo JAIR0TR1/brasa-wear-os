@@ -132,4 +132,8 @@
   <string name="nivel_subido">Level %1$d!</string>
   <string name="etapa_alcanzada">Now I\'m %1$s!</string>
   <string name="nivel_subido_voz">My fire grows with you.</string>
+  <string name="pasos_de_meta">%1$s of %2$s steps</string>
+  <string name="accion_tocar_brasa">make Brasa laugh</string>
+  <string name="accion_dar_lena">give Brasa 250 steps of firewood</string>
+  <string name="pagina_de">Page %1$d of %2$d</string>
 </resources>

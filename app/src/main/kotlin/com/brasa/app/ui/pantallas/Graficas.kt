@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.drawText
@@ -124,7 +125,7 @@ fun GraficaPasos(estado: EstadoBrasa, horaActual: Int = LocalTime.now().hour, fi
       val rInt = (minOf(maxWidth, maxHeight) / 2 - Tokens.Espacio.bordeSeguro) * (1f - 0.32f)
       // La línea de "pico" queda bajo el centro, donde la cuerda del anillo interior es más corta.
       val ancho = rInt * 2 * 0.7f
-      Column(Modifier.width(ancho), horizontalAlignment = Alignment.CenterHorizontally) {
+      Column(Modifier.width(ancho).clearAndSetSemantics {}, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(stringResource(R.string.hora_eje, 0), style = Tipo.dato.copy(fontSize = 10.sp), color = colores.textoSecundario, maxLines = 1)
         Spacer(Modifier.height(2.dp))
         BasicText(

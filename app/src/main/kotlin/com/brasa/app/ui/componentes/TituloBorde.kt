@@ -1,5 +1,9 @@
 package com.brasa.app.ui.componentes
 
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,10 +30,17 @@ fun TituloBorde(
   texto: String,
   color: Color = BrasaTema.colores.textoSecundario,
   margen: androidx.compose.ui.unit.Dp = Tokens.Espacio.s,
+  /** true: TalkBack lo anuncia como encabezado de la pantalla (false para la hora de Inicio). */
+  encabezado: Boolean = true,
 ) {
   val t = texto.uppercase()
+  // TalkBack lee el texto original (no en mayúsculas, que algunas voces deletrean).
+  val semantica = Modifier.clearAndSetSemantics {
+    contentDescription = texto
+    if (encabezado) heading()
+  }
   if (LocalConfiguration.current.isScreenRound) {
-    CurvedLayout(Modifier.fillMaxSize(), anchor = 270f) {
+    CurvedLayout(Modifier.fillMaxSize().then(semantica), anchor = 270f) {
       basicCurvedText(
         t,
         modifier = CurvedModifier.padding(margen),
@@ -41,7 +52,7 @@ fun TituloBorde(
     }
   } else {
     Box(Modifier.fillMaxSize().padding(top = margen), contentAlignment = Alignment.TopCenter) {
-      Text(t, style = Tipo.curvo, color = color, maxLines = 1)
+      Text(t, style = Tipo.curvo, color = color, maxLines = 1, modifier = semantica)
     }
   }
 }

@@ -133,4 +133,8 @@
   <string name="nivel_subido">¡Nivel %1$d!</string>
   <string name="etapa_alcanzada">¡Ahora soy %1$s!</string>
   <string name="nivel_subido_voz">Mi fuego crece contigo.</string>
+  <string name="pasos_de_meta">%1$s pasos de %2$s</string>
+  <string name="accion_tocar_brasa">hacer reír a Brasa</string>
+  <string name="accion_dar_lena">dar 250 pasos de leña a Brasa</string>
+  <string name="pagina_de">Página %1$d de %2$d</string>
 </resources>

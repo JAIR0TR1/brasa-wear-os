@@ -109,12 +109,13 @@ fun BotonBrasa(
   val textoColor = if (colores.oscuro) Tokens.Colores.Negro else Color.White
   Row(
     modifier
-      .defaultMinSize(minHeight = Tokens.Espacio.tactil)
+      .defaultMinSize(minWidth = Tokens.Espacio.tactil * 2, minHeight = Tokens.Espacio.tactil)
       .clip(CircleShape)
       .background(Brush.horizontalGradient(listOf(lerp(color, Tokens.Colores.FuegoClaro, if (colores.oscuro) 0.18f else 0f), color)))
       .clickable(role = Role.Button, onClick = onClick)
       .padding(horizontal = Tokens.Espacio.l + Tokens.Espacio.xs),
     verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.Center,
   ) {
     if (icono != null) {
       Box(Modifier.size(18.dp), contentAlignment = Alignment.Center) { icono() }

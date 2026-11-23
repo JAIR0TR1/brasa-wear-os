@@ -32,6 +32,8 @@ import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import com.brasa.app.BrasaViewModel
+import com.brasa.app.EstadoBrasa
+import com.brasa.app.data.Ajustes
 import com.brasa.app.Celebracion
 import com.brasa.app.ui.pantallas.SubidaNivel
 import com.brasa.app.data.permisosSalud
@@ -85,47 +87,14 @@ fun BrasaApp(vm: BrasaViewModel) {
         val nav = rememberSwipeDismissableNavController()
         SwipeDismissableNavHost(nav, startDestination = PRINCIPAL) {
           composable(PRINCIPAL) {
-            val paginas = rememberPagerState { PAGINAS }
-            val alcance = rememberCoroutineScope()
-            val foco = remember { FocusRequester() }
-            var acumulado by remember { mutableFloatStateOf(0f) }
-            Box(
-              Modifier
-                .fillMaxSize()
-                // Corona / bisel giratorio: pasa de página entre Inicio, gráficas y evolución.
-                .onRotaryScrollEvent { e ->
-                  if (paginas.currentPage == PAGINAS - 1) return@onRotaryScrollEvent false
-                  acumulado += e.verticalScrollPixels
-                  if (kotlin.math.abs(acumulado) > 60f) {
-                    val destino = (paginas.currentPage + if (acumulado > 0) 1 else -1).coerceIn(0, PAGINAS - 1)
-                    acumulado = 0f
-                    alcance.launch { paginas.animateScrollToPage(destino) }
-                  }
-                  true
-                }
-                .focusRequester(foco)
-                .focusable(),
-            ) {
-              LaunchedEffect(Unit) { foco.requestFocus() }
-              HorizontalPager(paginas, Modifier.fillMaxSize(), beyondViewportPageCount = 0) { i ->
-                when (i) {
-                  0 -> Inicio(estado, onTocarBrasa = vm::tocarBrasa, onRespirar = { nav.navigate(RESPIRAR) })
-                  1 -> GraficaPasos(estado)
-                  2 -> GraficaPulso(estado)
-                  3 -> GraficaSemana(estado, fraseMeta = estado.fraseMeta)
-                  4 -> Evolucion(estado)
-                  else -> AjustesPantalla(
-                    ajustes,
-                    AccionesAjustes(
-                      tema = { vm.tema(it) }, demo = { vm.demo(it) },
-                      emocion = { vm.emocionDemo(it) }, etapa = { vm.etapaDemo(it) }, permisos = pedir,
-                    ),
-                    fuente = estado.fuente,
-                  )
-                }
-              }
-              IndicadorPaginas(total = PAGINAS, actual = paginas.currentPage)
-            }
+            PaginasPrincipales(
+              estado, ajustes,
+              AccionesAjustes(
+                tema = { vm.tema(it) }, demo = { vm.demo(it) },
+                emocion = { vm.emocionDemo(it) }, etapa = { vm.etapaDemo(it) }, permisos = pedir,
+              ),
+              onTocarBrasa = vm::tocarBrasa, onRespirar = { nav.navigate(RESPIRAR) },
+            )
           }
           composable(RESPIRAR) {
             // Se fija al entrar: el "antes" no cambia durante el ejercicio.
@@ -143,5 +112,54 @@ fun BrasaApp(vm: BrasaViewModel) {
     }
     subida?.let { SubidaNivel(it.nivel, it.etapa, it.etapaNueva, onFin = { subida = null }) }
    }
+  }
+}
+
+/**
+ * Páginas principales (deslizar en horizontal o girar la corona): Inicio · Pasos · Pulso · Semana ·
+ * Evolución · Ajustes. En Ajustes la corona desplaza la lista en lugar de cambiar de página.
+ */
+@Composable
+fun PaginasPrincipales(
+  estado: EstadoBrasa,
+  ajustes: Ajustes,
+  acciones: AccionesAjustes,
+  onTocarBrasa: () -> Unit,
+  onRespirar: () -> Unit,
+  paginaInicial: Int = 0,
+) {
+  val paginas = rememberPagerState(initialPage = paginaInicial) { PAGINAS }
+  val alcance = rememberCoroutineScope()
+  val foco = remember { FocusRequester() }
+  var acumulado by remember { mutableFloatStateOf(0f) }
+  Box(
+    Modifier
+      .fillMaxSize()
+      // Corona / bisel giratorio: pasa de página entre Inicio, gráficas y evolución.
+      .onRotaryScrollEvent { e ->
+        if (paginas.currentPage == PAGINAS - 1) return@onRotaryScrollEvent false
+        acumulado += e.verticalScrollPixels
+        if (kotlin.math.abs(acumulado) > 60f) {
+          val destino = (paginas.currentPage + if (acumulado > 0) 1 else -1).coerceIn(0, PAGINAS - 1)
+          acumulado = 0f
+          alcance.launch { paginas.animateScrollToPage(destino) }
+        }
+        true
+      }
+      .focusRequester(foco)
+      .focusable(),
+  ) {
+    LaunchedEffect(Unit) { foco.requestFocus() }
+    HorizontalPager(paginas, Modifier.fillMaxSize(), beyondViewportPageCount = 0) { i ->
+      when (i) {
+        0 -> Inicio(estado, onTocarBrasa = onTocarBrasa, onRespirar = onRespirar)
+        1 -> GraficaPasos(estado)
+        2 -> GraficaPulso(estado)
+        3 -> GraficaSemana(estado, fraseMeta = estado.fraseMeta)
+        4 -> Evolucion(estado)
+        else -> AjustesPantalla(ajustes, acciones, fuente = estado.fuente)
+      }
+    }
+    IndicadorPaginas(total = PAGINAS, actual = paginas.currentPage)
   }
 }

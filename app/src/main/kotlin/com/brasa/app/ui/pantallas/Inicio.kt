@@ -32,7 +32,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -109,9 +112,12 @@ fun Inicio(
     else estado.fraseIa ?: frases[estado.frase.mod(frases.size)]
   val descAnillo = stringResource(R.string.anillo_descripcion, (estado.progreso * 100).toInt())
 
-  FondoEmocion(estado.emocion) {
-    AnilloBorde(estado.progreso, acento, animado = animado, descripcion = descAnillo)
-    TituloBorde(reloj, margen = 20.dp)
+  val descPasos = stringResource(R.string.pasos_de_meta, pasos, meta)
+  val accionBrasa = stringResource(if (estado.fuente == Fuente.MANUAL) R.string.accion_dar_lena else R.string.accion_tocar_brasa)
+  // Orden de lectura: hora → Brasa → pasos → frase o botón → anillo de la meta.
+  FondoEmocion(estado.emocion, Modifier.semantics { isTraversalGroup = true }) {
+    AnilloBorde(estado.progreso, acento, Modifier.semantics { traversalIndex = 1f }, animado = animado, descripcion = descAnillo)
+    TituloBorde(reloj, margen = 20.dp, encabezado = false)
     Column(
       Modifier.fillMaxSize().padding(horizontal = Tokens.Espacio.xl),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -128,7 +134,7 @@ fun Inicio(
           .weight(1f)
           // 1.14 creciendo hacia abajo: Brasa es la protagonista (puede invadir un poco su margen interno, nunca el texto).
           .graphicsLayer { scaleX = nacer.value * 1.14f; scaleY = nacer.value * 1.14f; alpha = nacer.value.coerceIn(0f, 1f); transformOrigin = androidx.compose.ui.graphics.TransformOrigin(0.5f, 0.15f) }
-          .clickable(remember { MutableInteractionSource() }, indication = null) {
+          .clickable(remember { MutableInteractionSource() }, indication = null, onClickLabel = accionBrasa) {
             toques++
             haptica.toque()
             onTocarBrasa()
@@ -137,7 +143,7 @@ fun Inicio(
       // Pasos de hoy: cifra protagonista + meta en mono.
       Row(
         verticalAlignment = Alignment.Bottom,
-        modifier = Modifier.semantics(mergeDescendants = true) {},
+        modifier = Modifier.clearAndSetSemantics { contentDescription = descPasos },
       ) {
         Text(pasos, style = Tipo.cifra.copy(fontSize = 25.sp), color = colores.texto, maxLines = 1)
         Spacer(Modifier.width(Tokens.Espacio.xs))
