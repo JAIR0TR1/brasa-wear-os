@@ -3,8 +3,6 @@ import { generar, limpiar } from "../lib/ia.js";
 import { json, leer, limitar } from "../lib/http.js";
 import { metaLocal } from "../lib/respaldo.js";
 
-export const config = { maxDuration: 10 };
-
 /**
  * POST /api/meta — explica en 1 frase el cambio de meta. La meta NO se calcula aquí:
  * la calcula el reloj con reglas deterministas; la IA solo la explica.

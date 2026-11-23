@@ -10,10 +10,19 @@ export const MODELO = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
  */
 const TIMEOUT_MS = 7_000;
 
-let cliente: GoogleGenAI | null = null;
-export const iaDisponible = () => Boolean(process.env.GEMINI_API_KEY);
+/** Lo único que se usa del SDK (permite simular Gemini en las pruebas). */
+type ClienteIa = Pick<GoogleGenAI, "models">;
+let cliente: ClienteIa | null = null;
+let simulado = false;
+export const iaDisponible = () => simulado || Boolean(process.env.GEMINI_API_KEY);
 
-function ia(): GoogleGenAI {
+/** Solo para pruebas: sustituye el cliente de Gemini por uno simulado (null = volver al real). */
+export function usarClienteIa(c: ClienteIa | null) {
+  cliente = c;
+  simulado = c !== null;
+}
+
+function ia(): ClienteIa {
   // La clave SOLO vive en variables de entorno del servidor (Vercel o .env.local). Nunca en el reloj ni en git.
   cliente ??= new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   return cliente;

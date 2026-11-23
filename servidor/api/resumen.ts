@@ -3,8 +3,6 @@ import { generar, limpiar } from "../lib/ia.js";
 import { json, leer, limitar } from "../lib/http.js";
 import { resumenLocal } from "../lib/respaldo.js";
 
-export const config = { maxDuration: 10 };
-
 /** POST /api/resumen — resumen del día en 2 frases a partir de agregados. */
 export async function POST(req: Request) {
   const d = await leer(req, ResumenEntrada);

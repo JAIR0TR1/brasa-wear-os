@@ -8,5 +8,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["api", "lib", "dev.ts", "probar.ts"]
+  "include": ["api", "lib", "pruebas", "dev.ts", "probar.ts"]
 }

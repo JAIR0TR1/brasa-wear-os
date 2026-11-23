@@ -1,6 +1,9 @@
 import type { z } from "zod";
 import { permitir } from "./limite.js";
 
+/** Las peticiones legítimas del reloj ocupan < 300 bytes. */
+export const MAX_CUERPO = 2_000;
+
 export const json = (cuerpo: unknown, estado = 200) =>
   new Response(JSON.stringify(cuerpo), {
     status: estado,
@@ -14,8 +17,10 @@ export const error = (estado: number, codigo: string, mensaje: string) => json({
 export async function leer<T extends z.ZodType>(req: Request, esquema: T): Promise<z.infer<T> | Response> {
   const tipo = req.headers.get("content-type") ?? "";
   if (!tipo.includes("application/json")) return error(415, "tipo_no_soportado", "Usa application/json.");
+  // Se rechaza antes de leer si el tamaño declarado ya se pasa; y otra vez tras leer (por si no se declaró).
+  if (Number(req.headers.get("content-length") ?? 0) > MAX_CUERPO) return error(413, "demasiado_grande", "Cuerpo demasiado grande.");
   const texto = await req.text();
-  if (texto.length > 2_000) return error(413, "demasiado_grande", "Cuerpo demasiado grande.");
+  if (texto.length > MAX_CUERPO) return error(413, "demasiado_grande", "Cuerpo demasiado grande.");
   let bruto: unknown;
   try { bruto = JSON.parse(texto); } catch { return error(400, "json_invalido", "JSON mal formado."); }
   const r = esquema.safeParse(bruto);

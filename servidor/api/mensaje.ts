@@ -3,8 +3,6 @@ import { generar, limpiar } from "../lib/ia.js";
 import { json, leer, limitar } from "../lib/http.js";
 import { fraseLocal } from "../lib/respaldo.js";
 
-export const config = { maxDuration: 10 };
-
 const SITUACION: Record<string, string> = {
   saludo: "Saluda al empezar el día.",
   inactividad: "La persona lleva rato sin moverse: anímala con suavidad a caminar un poco.",
