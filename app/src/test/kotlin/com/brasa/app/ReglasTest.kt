@@ -141,6 +141,32 @@ class HistorialTest {
     assertEquals(90, n.xpPrevio)
   }
 
+  @Test fun respaldoConservaNivelYMetaSinDatosDeSalud() {
+    val r = com.brasa.app.data.Registro(
+      com.brasa.app.data.Dia(epochDay = 100, pasos = 6000, pulsos = listOf(com.brasa.app.domain.Muestra(1L, 70))),
+      historial = List(6) { 8000 }, meta = 8200, metaAnterior = 8000, xpPrevio = 1500, respirosTotales = 3, permisosPreguntados = true,
+    )
+    val p = com.brasa.app.data.Historial.progresoDe(r)
+    assertEquals(1500 + 60 + 30, p.xpTotal)
+    val nuevo = com.brasa.app.data.Historial.desdeRespaldo(p, 105)
+    // Mismo nivel y XP en el reloj nuevo.
+    val xpNuevo = nuevo.xpPrevio + Reglas.xpPorPasos(nuevo.hoy.pasos) + nuevo.respirosTotales * Reglas.XP_POR_RESPIRACION
+    assertEquals(p.xpTotal, xpNuevo)
+    assertEquals(Reglas.nivel(p.xpTotal), Reglas.nivel(xpNuevo))
+    assertEquals(8200, nuevo.meta)
+    // Nada de salud ni permisos: el día empieza vacío y se vuelven a pedir los permisos.
+    assertEquals(0, nuevo.hoy.pasos)
+    assertTrue(nuevo.hoy.pulsos.isEmpty())
+    assertTrue(nuevo.historial.isEmpty())
+    assertFalse(nuevo.permisosPreguntados)
+  }
+
+  @Test fun sinRespaldoEmpiezaDeCero() {
+    val r = com.brasa.app.data.Historial.desdeRespaldo(null, 105)
+    assertEquals(0, r.xpPrevio)
+    assertEquals(Reglas.META_INICIAL, r.meta)
+  }
+
   @Test fun mismoDiaNoCambia() {
     val r = com.brasa.app.data.Registro(com.brasa.app.data.Dia(epochDay = 100, pasos = 500))
     assertEquals(r, com.brasa.app.data.Historial.cambiarDia(r, 100))

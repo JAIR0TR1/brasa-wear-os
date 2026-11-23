@@ -20,6 +20,8 @@
 
   <application
     android:allowBackup="true"
+    android:dataExtractionRules="@xml/reglas_extraccion"
+    android:fullBackupContent="@xml/respaldo_completo"
     android:icon="@drawable/ic_brasa"
     android:label="@string/app_name"
     android:supportsRtl="true"
