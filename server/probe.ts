@@ -11,9 +11,9 @@ const post = (url: string, body: unknown) =>
 const show = async (name: string, response: Response | Promise<Response>) => { const r = await response; console.log(name.padEnd(28), r.status, await r.text()); };
 
 await show("salud", health());
-for (const idioma of ["es", "en"] as const) {
-  for (const situacion of ["saludo", "tension", "meta_cumplida"] as const) {
-    await show(`mensaje ${idioma} ${situacion}`, message(post("/api/mensaje", { dispositivo: ID, idioma, situacion, actividad: "medio", emocion: "feliz", etapa: "llama" })));
+for (const language of ["es", "en"] as const) {
+  for (const situation of ["saludo", "tension", "meta_cumplida"] as const) {
+    await show(`mensaje ${language} ${situation}`, message(post("/api/mensaje", { dispositivo: ID, idioma: language, situacion: situation, actividad: "medio", emocion: "feliz", etapa: "llama" })));
   }
 }
 await show("meta es sube", goal(post("/api/meta", { dispositivo: ID, idioma: "es", tendencia: "sube", constancia: "alto", actividadMedia: "medio" })));
