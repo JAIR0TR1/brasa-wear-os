@@ -6,9 +6,9 @@
   "description": "Servidor de Brasa: frases con Gemini a partir de datos agregados (nunca datos de salud exactos).",
   "scripts": {
     "dev": "tsx --env-file-if-exists=.env.local dev.ts",
-    "probar": "tsx --env-file-if-exists=.env.local probar.ts",
+    "probe": "tsx --env-file-if-exists=.env.local probe.ts",
     "tipos": "tsc --noEmit",
-    "test": "node --import tsx --test pruebas/*.test.ts"
+    "test": "node --import tsx --test tests/*.test.ts"
   },
   "engines": {
     "node": ">=20"

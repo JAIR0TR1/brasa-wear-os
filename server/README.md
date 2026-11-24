@@ -33,7 +33,7 @@ npm install
 cp .env.example .env.local   # y pega tu GEMINI_API_KEY (este archivo no se sube a git)
 npm run dev                  # http://localhost:3000 · desde el emulador: http://10.0.2.2:3000
 npm test                     # pruebas sin red ni clave (Gemini simulado)
-npm run probar               # prueba real contra Gemini con la clave de .env.local
+npm run probe                # prueba real contra Gemini con la clave de .env.local
 npm run tipos                # comprobación de tipos
 ```
 

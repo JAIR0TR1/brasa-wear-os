@@ -17,9 +17,9 @@ captures/
 *.jks
 *.keystore
 # Servidor
-servidor/node_modules/
-servidor/.vercel/
-servidor/.env.local
+server/node_modules/
+server/.vercel/
+server/.env.local
 node_modules/
 .vercel/
 # SO

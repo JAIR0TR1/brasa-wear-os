@@ -1,5 +1,5 @@
 .env.local
 node_modules
-probar.ts
+probe.ts
 dev.ts
-pruebas
+tests

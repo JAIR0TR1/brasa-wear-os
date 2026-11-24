@@ -26,11 +26,11 @@ const R = {
   },
 } as const;
 
-export type SituacionR = "saludo" | "inactividad" | "tension" | "post_respiracion" | "meta_cumplida" | "subida_nivel";
+export type FallbackSituation = "saludo" | "inactividad" | "tension" | "post_respiracion" | "meta_cumplida" | "subida_nivel";
 
-export const fraseLocal = (idioma: "es" | "en", s: SituacionR) => {
-  const lista = R[idioma][s];
-  return lista[Math.floor(Math.random() * lista.length)]!;
+export const localPhrase = (language: "es" | "en", s: FallbackSituation) => {
+  const list = R[language][s];
+  return list[Math.floor(Math.random() * list.length)]!;
 };
-export const metaLocal = (idioma: "es" | "en", t: "sube" | "baja" | "igual") => R[idioma][`meta_${t}`];
-export const resumenLocal = (idioma: "es" | "en") => [...R[idioma].resumen];
+export const localGoalPhrase = (language: "es" | "en", trend: "sube" | "baja" | "igual") => R[language][`meta_${trend}`];
+export const localSummary = (language: "es" | "en") => [...R[language].resumen];
