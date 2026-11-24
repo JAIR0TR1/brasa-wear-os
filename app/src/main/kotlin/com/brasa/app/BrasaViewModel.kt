@@ -62,7 +62,7 @@ data class BrasaState(
   val stepsPerHour: List<Int> = List(24) { 0 },
   val heartRates: List<HeartRateSample> = emptyList(),
   val breathSessions: List<BreathSession> = emptyList(),
-  val historial: List<Int> = emptyList(),
+  val history: List<Int> = emptyList(),
   /** Frase de la IA para la situación actual (null = usar el banco local). */
   val aiPhrase: String? = null,
   /** Explicación de la meta (IA o null = frase local). */
@@ -74,7 +74,7 @@ private fun hourOf(ms: Long) = Instant.ofEpochMilli(ms).atZone(ZoneId.systemDefa
 
 class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   private val prefs = PreferencesStore(app)
-  private val historial = HistoryStore(app)
+  private val historyStore = HistoryStore(app)
   private val health = HealthRepository(app)
   private val server = ServerClient()
 
@@ -94,9 +94,9 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   private var lastRequestMs = 0L
   private var retryJob: kotlinx.coroutines.Job? = null
   private var lastBreathMs = 0L
-  private val _celebraciones = kotlinx.coroutines.flow.MutableSharedFlow<Celebration>(extraBufferCapacity = 4)
+  private val _celebrations = kotlinx.coroutines.flow.MutableSharedFlow<Celebration>(extraBufferCapacity = 4)
   /** Meta cumplida y subidas de nivel ocurridas mientras la app está abierta. */
-  val celebrations: kotlinx.coroutines.flow.SharedFlow<Celebration> = _celebraciones
+  val celebrations: kotlinx.coroutines.flow.SharedFlow<Celebration> = _celebrations
 
   /** true cuando hay que mostrar la pantalla que explica los permisos (solo la primera vez). */
   val askPermissions: StateFlow<Boolean> =
@@ -114,7 +114,7 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
 
   init {
     viewModelScope.launch {
-      record.value = historial.load(todayEpoch())
+      record.value = historyStore.load(todayEpoch())
       loaded.value = true
       startSensors()
       deviceId = prefs.deviceId()
@@ -132,9 +132,9 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
         val p = previousState
         if (loaded.value) previousState = e
         if (p == null || !loaded.value || p.source != e.source) return@collect
-        if (Rules.reachedGoal(p.progress, e.progress)) _celebraciones.tryEmit(Celebration.Goal)
+        if (Rules.reachedGoal(p.progress, e.progress)) _celebrations.tryEmit(Celebration.Goal)
         if (Rules.leveledUp(p.level, e.level)) {
-          _celebraciones.tryEmit(Celebration.Level(e.level, e.stage, Rules.newStage(p.level, e.level) != null))
+          _celebrations.tryEmit(Celebration.Level(e.level, e.stage, Rules.newStage(p.level, e.level) != null))
           situation.value = Situation.LEVEL_UP
           requestPhrase(Situation.LEVEL_UP, urgent = true)
         }
@@ -173,7 +173,7 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
   private fun updateRecord(f: (UserRecord) -> UserRecord) {
     record.update(f)
     val r = record.value
-    viewModelScope.launch { historial.save(r) }
+    viewModelScope.launch { historyStore.save(r) }
   }
 
   /** Aplica un dato de salud: pasos por hora, último movimiento y pulso (1 muestra/min como mucho). */
@@ -191,7 +191,7 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
             lastMovementMs = if (delta >= 15) t else d.lastMovementMs,
           )
         }
-        is HealthEvent.HeartRate -> d.copy(heartRates = agregarPulso(d.heartRates, HeartRateSample(e.ms, e.bpm)))
+        is HealthEvent.HeartRate -> d.copy(heartRates = addHeartRate(d.heartRates, HeartRateSample(e.ms, e.bpm)))
       }
       r.copy(today = newValue)
     }
@@ -211,10 +211,10 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
     return BrasaState(
       emotion = Rules.emotion(progress, elevated, idle),
       stage = Rules.stage(xp), level = Rules.level(xp), xp = xp, levelProgress = Rules.levelProgress(xp),
-      streak = Rules.streak(r.historial + d.steps, r.goal).coerceAtLeast(Rules.streak(r.historial, r.goal)),
+      streak = Rules.streak(r.history + d.steps, r.goal).coerceAtLeast(Rules.streak(r.history, r.goal)),
       steps = d.steps, goal = r.goal, previousGoal = r.previousGoal, progress = progress,
       heartRate = heartRate, heartRateElevated = elevated, phrase = f, greeting = s, source = source,
-      stepsPerHour = d.stepsPerHour, heartRates = d.heartRates, breathSessions = d.breathSessions, historial = r.historial,
+      stepsPerHour = d.stepsPerHour, heartRates = d.heartRates, breathSessions = d.breathSessions, history = r.history,
     )
   }
 
@@ -303,7 +303,7 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
     val id = deviceId ?: return
     val r = record.value
     val trend = when { r.goal > r.previousGoal -> "sube"; r.goal < r.previousGoal -> "baja"; else -> "igual" }
-    val previousDays = r.historial.takeLast(6)
+    val previousDays = r.history.takeLast(6)
     val consistency = if (previousDays.isEmpty()) ActivityLevel.LOW else levelOf(previousDays.count { it >= r.goal } / previousDays.size.toFloat())
     val averageLevel = if (previousDays.isEmpty()) ActivityLevel.LOW else levelOf(previousDays.average().toFloat() / r.goal)
     val languageCode = language()
@@ -328,7 +328,7 @@ class BrasaViewModel(app: Application) : AndroidViewModel(app) {
  * Añade una lectura de pulso: como mucho una por minuto (la nueva sustituye a la de ese minuto),
  * siempre ordenadas por hora aunque lleguen desordenadas (lotes de Health Services o el simulador).
  */
-fun agregarPulso(heartRates: List<HeartRateSample>, m: HeartRateSample): List<HeartRateSample> =
+fun addHeartRate(heartRates: List<HeartRateSample>, m: HeartRateSample): List<HeartRateSample> =
   (heartRates.filterNot { kotlin.math.abs(it.ms - m.ms) < 60_000 } + m).sortedBy { it.ms }.takeLast(24 * 60)
 
 /**
@@ -354,7 +354,7 @@ fun demoState(a: AppSettings, f: Int, s: Boolean, currentMinute: Int = minuteOfD
     heartRate = if (emotion == Emotion.RESTLESS) 96 else heartRates.lastOrNull()?.bpm ?: 64, heartRateElevated = emotion == Emotion.RESTLESS,
     phrase = f, greeting = s, source = DataSource.DEMO,
     stepsPerHour = demoStepsPerHour(steps, currentMinute / 60), heartRates = heartRates, breathSessions = demoBreaths(currentMinute),
-    historial = listOf(7200, 9100, 5400, 8800, 9600, 4300),
+    history = listOf(7200, 9100, 5400, 8800, 9600, 4300),
   )
 }
 

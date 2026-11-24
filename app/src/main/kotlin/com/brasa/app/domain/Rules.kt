@@ -85,8 +85,8 @@ object Rules {
    * Meta de mañana = media de los últimos 7 días × 1,05 (un pequeño reto), redondeada a 100,
    * limitada a ±15 % de la meta actual y al rango 3.000–15.000. Sin historial: se mantiene.
    */
-  fun adaptiveGoal(historial: List<Int>, currentGoal: Int): Int {
-    val days = historial.takeLast(7).filter { it > 0 }
+  fun adaptiveGoal(history: List<Int>, currentGoal: Int): Int {
+    val days = history.takeLast(7).filter { it > 0 }
     if (days.isEmpty()) return currentGoal.coerceIn(GOAL_MIN, GOAL_MAX)
     val proposal = days.average() * 1.05
     val limited = proposal.coerceIn(currentGoal * (1 - MAX_CHANGE), currentGoal * (1 + MAX_CHANGE))
@@ -105,7 +105,7 @@ object Rules {
     Stage.fromLevel(levelNow).takeIf { it != Stage.fromLevel(levelBefore) && levelNow > levelBefore }
 
   /** Racha: días consecutivos (desde el más reciente) en los que se alcanzó al menos el 60 % de la meta. */
-  fun streak(historial: List<Int>, goal: Int): Int = historial.reversed().takeWhile { it >= goal * 0.6 }.count()
+  fun streak(history: List<Int>, goal: Int): Int = history.reversed().takeWhile { it >= goal * 0.6 }.count()
 }
 
 /** Lectura de pulso con su instante (ms desde epoch). */

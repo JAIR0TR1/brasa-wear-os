@@ -131,11 +131,11 @@ class RulesTest {
 
 class HistoryTest {
   @Test fun dayChangeClosesDayAndRecalculatesGoal() {
-    val r = com.brasa.app.data.UserRecord(com.brasa.app.data.Day(epochDay = 100, steps = 9000), historial = List(6) { 8000 }, goal = 8000)
+    val r = com.brasa.app.data.UserRecord(com.brasa.app.data.Day(epochDay = 100, steps = 9000), history = List(6) { 8000 }, goal = 8000)
     val n = com.brasa.app.data.HistoryStore.rollOverDay(r, 101)
     assertEquals(101, n.today.epochDay)
     assertEquals(0, n.today.steps)
-    assertEquals(9000, n.historial.last())
+    assertEquals(9000, n.history.last())
     assertEquals(8000, n.previousGoal)
     assertEquals(8600, n.goal) // media 8143 × 1,05 = 8550 → 8600
     assertEquals(90, n.previousXp)
@@ -144,7 +144,7 @@ class HistoryTest {
   @Test fun backupKeepsLevelAndGoalWithoutHealthData() {
     val r = com.brasa.app.data.UserRecord(
       com.brasa.app.data.Day(epochDay = 100, steps = 6000, heartRates = listOf(com.brasa.app.domain.HeartRateSample(1L, 70))),
-      historial = List(6) { 8000 }, goal = 8200, previousGoal = 8000, previousXp = 1500, totalBreaths = 3, permissionsAsked = true,
+      history = List(6) { 8000 }, goal = 8200, previousGoal = 8000, previousXp = 1500, totalBreaths = 3, permissionsAsked = true,
     )
     val p = com.brasa.app.data.HistoryStore.progressOf(r)
     assertEquals(1500 + 60 + 30, p.totalXp)
@@ -157,7 +157,7 @@ class HistoryTest {
     // Nada de salud ni permisos: el día empieza vacío y se vuelven a pedir los permisos.
     assertEquals(0, newValue.today.steps)
     assertTrue(newValue.today.heartRates.isEmpty())
-    assertTrue(newValue.historial.isEmpty())
+    assertTrue(newValue.history.isEmpty())
     assertFalse(newValue.permissionsAsked)
   }
 
@@ -194,7 +194,7 @@ class DemoTest {
 class HeartRateTest {
   @Test fun oneReadingPerMinuteAndSorted() {
     var p = emptyList<com.brasa.app.domain.HeartRateSample>()
-    for ((ms, bpm) in listOf(200_000L to 70, 60_000L to 65, 230_000L to 72, 400_000L to 80)) p = agregarPulso(p, com.brasa.app.domain.HeartRateSample(ms, bpm))
+    for ((ms, bpm) in listOf(200_000L to 70, 60_000L to 65, 230_000L to 72, 400_000L to 80)) p = addHeartRate(p, com.brasa.app.domain.HeartRateSample(ms, bpm))
     assertEquals(listOf(60_000L, 230_000L, 400_000L), p.map { it.ms }) // 200 s y 230 s caen en el mismo minuto
     assertEquals(72, p[1].bpm) // la más nueva sustituye
   }

@@ -289,7 +289,7 @@ fun WeekChart(state: BrasaState, goalPhrase: String? = null, fixed: Boolean = fa
   val entrance = rememberEntrance(fixed = fixed)
   val locale = LocalConfiguration.current.locales[0]
   // Siempre 7 huecos (los días sin registro quedan vacíos): la barra de hoy nunca ocupa todo el ancho.
-  val previousDays = state.historial.takeLast(6)
+  val previousDays = state.history.takeLast(6)
   val days = List(6 - previousDays.size) { -1 } + previousDays + state.steps
   val labels = days.indices.map { i ->
     today.minusDays((days.size - 1 - i).toLong()).dayOfWeek.getDisplayName(TextStyle.NARROW, locale)
@@ -298,7 +298,7 @@ fun WeekChart(state: BrasaState, goalPhrase: String? = null, fixed: Boolean = fa
   val goalText = remember(state.goal, locale) { NumberFormat.getIntegerInstance(locale).format(state.goal) }
   // El primer día no hay cambio de meta que explicar: se explica qué irá apareciendo.
   val phrase = if (previousDays.isEmpty()) stringResource(R.string.first_day_hint) else goalPhrase ?: localGoalPhrase(state.goal, state.previousGoal)
-  val description = stringResource(R.string.week_chart_description, reached, state.historial.takeLast(6).size, state.goal)
+  val description = stringResource(R.string.week_chart_description, reached, state.history.takeLast(6).size, state.goal)
 
   EmotionBackground(Emotion.HAPPY, intensity = 0.5f) {
     EdgeTitle(stringResource(R.string.week))

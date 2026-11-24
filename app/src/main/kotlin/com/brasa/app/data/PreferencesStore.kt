@@ -97,7 +97,7 @@ data class Day(
 data class UserRecord(
   @SerialName("hoy") val today: Day,
   /** Pasos de los últimos 7 días completos (el último = ayer). */
-  @SerialName("historial") val historial: List<Int> = emptyList(),
+  @SerialName("historial") val history: List<Int> = emptyList(),
   @SerialName("meta") val goal: Int = com.brasa.app.domain.Rules.GOAL_INITIAL,
   /** Meta del día anterior, para que la IA explique el cambio. */
   @SerialName("metaAnterior") val previousGoal: Int = com.brasa.app.domain.Rules.GOAL_INITIAL,
@@ -163,12 +163,12 @@ class HistoryStore(private val ctx: Context) {
     /** Si cambió el día: cierra ayer en el historial, recalcula la meta y suma la XP. */
     fun rollOverDay(r: UserRecord, today: Long): UserRecord {
       if (r.today.epochDay == today) return r
-      val historial = (r.historial + r.today.steps).takeLast(7)
+      val history = (r.history + r.today.steps).takeLast(7)
       return r.copy(
         today = Day(today),
-        historial = historial,
+        history = history,
         previousGoal = r.goal,
-        goal = com.brasa.app.domain.Rules.adaptiveGoal(historial, r.goal),
+        goal = com.brasa.app.domain.Rules.adaptiveGoal(history, r.goal),
         previousXp = r.previousXp + com.brasa.app.domain.Rules.xpForSteps(r.today.steps),
       )
     }

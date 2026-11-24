@@ -53,7 +53,7 @@ fun Phase4Content(name: String) {
       "grafica-pasos" -> StepsChart(demo.copy(stepsPerHour = demoStepsPerHour(demo.steps, CAPTURE_HOUR)), currentHour = CAPTURE_HOUR, fixed = true)
       "grafica-pulso" -> HeartRateChart(demo, fixed = true)
       "grafica-semana" -> WeekChart(demo, fixed = true, today = CAPTURE_DATE)
-      "grafica-semana-primer-dia" -> WeekChart(demo.copy(historial = emptyList(), steps = 2300, goal = 6000, previousGoal = 6000), fixed = true, today = CAPTURE_DATE)
+      "grafica-semana-primer-dia" -> WeekChart(demo.copy(history = emptyList(), steps = 2300, goal = 6000, previousGoal = 6000), fixed = true, today = CAPTURE_DATE)
       "grafica-midiendo-pulso" -> HeartRateChart(demo.copy(heartRates = demo.heartRates.takeLast(2), breathSessions = emptyList()), fixed = true)
       "grafica-vacia-pasos" -> StepsChart(empty, currentHour = 9, fixed = true)
       "grafica-vacia-pulso" -> HeartRateChart(empty, fixed = true)
