@@ -47,7 +47,7 @@ Reloj (Kotlin + Compose for Wear OS)                Servidor (Vercel)
 │ Banco de frases local (sin red) ─┘    │   frase   └──────────────────────────────┘
 └───────────────────────────────────────┘
 ```
-- Las **reglas** (emoción, tensión, XP, meta, celebraciones) son funciones puras en `app/.../domain/Reglas.kt`, probadas con JUnit.
+- Las **reglas** (emoción, tensión, XP, meta, celebraciones) son funciones puras en `app/.../domain/Rules.kt`, probadas con JUnit.
 - **Tensión** = media de los últimos 3 min ≥ tu pulso de reposo + 20 lpm **y** sin pasos en 5 min. Moverse con el pulso alto no es tensión.
 - **XP** = 1 por cada 100 pasos + 10 por respiración. **Nivel** = 1 + ⌊√(XP/25)⌋.
 
@@ -60,7 +60,7 @@ Reloj (Kotlin + Compose for Wear OS)                Servidor (Vercel)
 Brasa usa la **copia de seguridad de Google** del propio usuario (Android Auto Backup). Solo se respalda un almacén aparte con los ajustes y el progreso (XP total, respiraciones, meta). Al restaurar en otro reloj, Brasa vuelve con el mismo nivel y la misma meta; los datos de salud, el historial por día y el id del reloj no se copian, y los permisos se vuelven a pedir.
 
 ## Funciona siempre
-Sin internet, sin servidor o con `SERVER_URL` vacío la app funciona igual: el cliente HTTP nunca lanza, corta a los 3 s de conexión y Brasa usa sus frases locales (probado en `ServidorSinRedTest` y en el emulador en modo avión).
+Sin internet, sin servidor o con `SERVER_URL` vacío la app funciona igual: el cliente HTTP nunca lanza, corta a los 3 s de conexión y Brasa usa sus frases locales (probado en `ServerOfflineTest` y en el emulador en modo avión).
 
 ## Tecnologías
 | Parte | Tecnología |
@@ -76,7 +76,7 @@ Sin internet, sin servidor o con `SERVER_URL` vacío la app funciona igual: el c
 
 ```bash
 # 1. Servidor (opcional: la app funciona sin él). Ya desplegado en:
-#    https://brasa-servidor.vercel.app   (ver servidor/README.md para desplegar el tuyo)
+#    https://brasa-servidor.vercel.app   (ver server/README.md para desplegar el tuyo)
 # 2. local.properties en la raíz:
 #    sdk.dir=…            (lo crea Android Studio)
 #    SERVER_URL=https://brasa-servidor.vercel.app
@@ -95,13 +95,13 @@ adb shell am broadcast -a com.brasa.app.SIMULAR -p com.brasa.app --ei pulso 112 
 ```bash
 ./gradlew :app:testDebugUnitTest          # 170 pruebas: reglas, interfaz, accesibilidad, sin servidor y capturas
 ./gradlew :app:verifyRoborazziDebug       # compara las 128 capturas con docs/capturas/roborazzi/
-cd servidor && npm test                   # 17 pruebas: validación, datos exactos rechazados, Gemini simulado, fallos de red
+cd server && npm test                   # 18 pruebas: validación, datos exactos rechazados, Gemini simulado, fallos de red
 ```
 
 ## Documentación
 - [Justificación de diseño](docs/justificacion-diseno.md) (Nielsen, Gestalt, Fitts, WCAG)
 - [Dirección de arte](docs/direccion-de-arte.md) · [Revisión visual](docs/revision-visual.md) · [Sensores](docs/sensores.md)
-- [QA](docs/QA.md) · [Guion de la demo](docs/demo-profesor.md) · [Servidor](servidor/README.md)
+- [QA](docs/QA.md) · [Guion de la demo](docs/demo-profesor.md) · [Servidor](server/README.md)
 
 ## Estado
 Versión 1.0.0 terminada: todas las pantallas, servidor desplegado, pruebas en verde. Pendiente (fuera de alcance): resumen del día con IA en el reloj (el servidor ya tiene `/api/resumen`), datos con la app cerrada (`PassiveListenerService`), almacenamiento persistente del servidor (Upstash) y tile de Wear OS.

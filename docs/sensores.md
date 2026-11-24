@@ -11,7 +11,7 @@
 - Sin permisos o sin sensores → **modo manual**: tocar a Brasa le da 250 pasos de "leña"; las reglas funcionan igual.
 - Los datos exactos se guardan solo en el reloj (DataStore). Nunca se envían.
 
-## Fórmulas (`domain/Reglas.kt`, probadas en `ReglasTest`)
+## Fórmulas (`domain/Rules.kt`, probadas en `RulesTest`)
 - **Emoción**: pulso elevado en reposo → inquieta; meta ≥ 100 % → eufórica; meta < 20 % o ≥ 3 h quieta → apagada; < 60 % → tranquila; si no → feliz.
 - **Base en reposo**: percentil 20 del pulso del día (65 lpm si hay < 10 muestras).
 - **Tensión**: media de los últimos 3 min ≥ base + 20 lpm (≥ 2 lecturas) **y** sin pasos en 5 min. Moverse con pulso alto no es tensión.

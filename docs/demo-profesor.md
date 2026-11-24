@@ -24,7 +24,7 @@ curl -s https://brasa-servidor.vercel.app/api/mensaje -H "content-type: applicat
 ```
 → `400 entrada_invalida`. Quitar `,\"pulso\":112` → frase de Gemini. Cambiar de reloj: "se usa la copia de seguridad de Google: vuelve el nivel, no los datos de salud".
 
-**4:20 – 5:00 · Diseño.** Tema claro (Ajustes → Tema), fuente grande y lector de pantalla: contraste AA probado automáticamente, áreas táctiles de 48 dp, nada a menos de 18 dp del borde, 170 + 17 pruebas.
+**4:20 – 5:00 · Diseño.** Tema claro (Ajustes → Tema), fuente grande y lector de pantalla: contraste AA probado automáticamente, áreas táctiles de 48 dp, nada a menos de 18 dp del borde, 170 + 18 pruebas.
 
 ## Mostrar con datos "reales" (simulador)
 Con el modo demo **desactivado**:

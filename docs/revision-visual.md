@@ -135,7 +135,7 @@ Lo que ya funcionaba: el remolino de anillos opuestos del arranque, la respiraci
 | Tras respirar, el cambio de emoción borraba al instante la frase de reconocimiento | Se mantiene un minuto |
 | Demo: la explicación de la meta venía de la IA con la meta real (incoherente con la meta demo) | En demo se usa la frase local |
 | Semana en tema claro: frase larga de la IA cortada con "…" | autoSize (10–13 sp) y margen de 12 dp |
-| Simulador de pulso: lecturas con fecha hacia atrás quedaban desordenadas | Lecturas ordenadas y una por minuto (`agregarPulso`, con prueba) |
+| Simulador de pulso: lecturas con fecha hacia atrás quedaban desordenadas | Lecturas ordenadas y una por minuto (`addHeartRate`, con prueba) |
 
 **Resultado:** pasa. Capturas en `docs/capturas/emulador/v1/`.
 

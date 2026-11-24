@@ -30,7 +30,7 @@ Diseño de interfaz y de interacción, dirección de arte, ilustración procedur
 Kotlin 2.3.20 · Jetpack Compose (BOM 2026.03.01) · Compose for Wear OS Material 3 1.7.1 · Health Services 1.1.0 · DataStore 1.3.0 · kotlinx.serialization · TypeScript · Vercel Functions · Gemini (`@google/genai` 2.32.0) · Zod · Roborazzi + Robolectric · Compose UI Test.
 
 ## Cifras verificables
-- **187 pruebas automáticas** en verde: 170 en la app (23 de reglas y datos, 8 de interfaz, 5 de accesibilidad, 6 de funcionamiento sin servidor y 128 capturas de pantalla) + 17 del servidor.
+- **188 pruebas automáticas** en verde: 170 en la app (23 de reglas y datos, 8 de interfaz, 5 de accesibilidad, 6 de funcionamiento sin servidor y 128 capturas de pantalla) + 18 del servidor.
 - **128 capturas** comparadas en cada cambio, en 6 variantes: redondo 227 dp, redondo 192 dp, cuadrado 198 dp, tema claro, inglés y fuente ×1,3.
 - Contraste **AA (≥ 4,5:1)** en todos los colores de texto, comprobado por una prueba.
 - Áreas táctiles **≥ 48 dp** en todas las pantallas, comprobadas por una prueba.

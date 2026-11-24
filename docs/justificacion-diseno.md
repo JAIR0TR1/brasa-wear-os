@@ -29,7 +29,7 @@ Brasa es una interfaz para una pantalla redonda de unos 3 cm que se mira en un p
 ## 3. Ley de Fitts
 
 En un reloj el dedo tapa buena parte de la pantalla, así que los objetivos deben ser **grandes y estar donde ya está el dedo**:
-- Áreas táctiles de **al menos 48 × 48 dp** (el botón píldora mide como mínimo 96 × 48 dp; las filas de ajustes 52 dp de alto). Una prueba automática (`AccesibilidadTest`) mide todos los elementos táctiles de todas las pantallas en el reloj más pequeño (192 dp).
+- Áreas táctiles de **al menos 48 × 48 dp** (el botón píldora mide como mínimo 96 × 48 dp; las filas de ajustes 52 dp de alto). Una prueba automática (`AccessibilityTest`) mide todos los elementos táctiles de todas las pantallas en el reloj más pequeño (192 dp).
 - **Brasa entera es el objetivo** de toque en Inicio (casi media pantalla).
 - El botón **Respirar** aparece en el centro inferior, a la altura natural del pulgar, solo cuando hace falta.
 - Navegar no exige apuntar: deslizar en cualquier punto o girar la corona.
@@ -38,7 +38,7 @@ En un reloj el dedo tapa buena parte de la pantalla, así que los objetivos debe
 
 | Criterio | Aplicación |
 |---|---|
-| 1.4.3 Contraste (AA) | Todos los colores de texto de los tokens tienen ≥ 4,5:1 sobre su fondo, en oscuro y en claro, incluidos los botones. Lo comprueba `AccesibilidadTest.contrasteAADeLosTextos`. |
+| 1.4.3 Contraste (AA) | Todos los colores de texto de los tokens tienen ≥ 4,5:1 sobre su fondo, en oscuro y en claro, incluidos los botones. Lo comprueba `AccessibilityTest.textContrastMeetsAA`. |
 | 1.4.1 Uso del color | Las emociones se distinguen por forma y gesto además de por color; el botón Respirar tiene icono y texto. |
 | 1.4.4 / 1.4.12 Texto redimensionable | Todo el texto en `sp`. Se revisa con fuente ×1,3 en las capturas; las frases largas reducen su tamaño hasta un mínimo en lugar de cortarse. |
 | 2.5.8 Tamaño del objetivo | ≥ 48 dp (por encima de los 24 px mínimos de WCAG; es la guía de Wear OS). |

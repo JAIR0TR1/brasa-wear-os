@@ -9,7 +9,7 @@
 - Prohibido: Material por defecto sin personalizar, fondos grises, tarjetas planas, emojis, texto cortado en el borde.
 - Textos en `res/values` (es por defecto) y `res/values-en`. Nada de strings en el código.
 - Privacidad: pasos y pulso exactos **nunca** salen del reloj; al servidor solo niveles (bajo/medio/alto, pulso elevado en reposo).
-- `GEMINI_API_KEY` solo en Vercel / `servidor/.env.local`. `SERVER_URL` en `local.properties` → BuildConfig.
+- `GEMINI_API_KEY` solo en Vercel / `server/.env.local`. `SERVER_URL` en `local.properties` → BuildConfig.
 - No es dispositivo médico: hablar de "señales de tensión", nunca de diagnósticos.
 - Commit en español después de cada paso que compile.
 
@@ -33,15 +33,16 @@ AGP 9.1.1 · Gradle 9.3.1 · Kotlin 2.3.20 · Compose BOM 2026.03.01 · Wear Com
 ## Arquitectura
 ```
 app/src/main/kotlin/com/brasa/app/
-  ui/theme/    Tokens.kt, Tipografia.kt, BrasaTheme.kt
-  ui/brasa/    Emocion.kt, Etapa.kt, Pose.kt, DibujoBrasa.kt, Brasa.kt (composable animado)
-  ui/pantallas/ galería (prueba), arranque, inicio, respirar, gráficas, evolución, ajustes
+  ui/theme/      Tokens.kt, Typography.kt, BrasaTheme.kt
+  ui/brasa/      Pose.kt (Emotion, Stage), BrasaDrawing.kt, Brasa.kt (composable animado)
+  ui/components/ Components.kt, EdgeTitle.kt
+  ui/screens/    Gallery (prueba), Startup, Home, Breathe, Charts, Evolution, Settings, Permissions, LevelUp
   domain/      reglas puras (emoción, tensión, XP, meta, celebraciones) con tests
   data/        Health Services, DataStore, cliente HTTP, frases locales
-servidor/      TypeScript + Vercel + Zod + Gemini Flash-Lite (pruebas en servidor/pruebas, `npm test`)
+server/         TypeScript + Vercel + Zod + Gemini Flash-Lite (pruebas en server/tests, `npm test`)
 ```
 - DataStore "brasa" (solo en el reloj, fuera de la copia): registro del día con pasos/pulso, historial e id anónimo.
-- DataStore "brasa_respaldo" (Auto Backup, `res/xml/reglas_extraccion.xml` y `respaldo_completo.xml`): ajustes, XP total, respiraciones y meta.
+- DataStore "brasa_respaldo" (Auto Backup, `res/xml/extraction_rules.xml` y `full_backup.xml`): ajustes, XP total, respiraciones y meta.
 
 ## Fases (estado)
 - [x] 0 Entorno, git, proyecto
@@ -63,23 +64,24 @@ Mejoras futuras (no hechas a propósito):
 - SDK `@google/genai` 2.32.0, `ai.models.generateContent` con `responseMimeType` + `responseJsonSchema` (de `z.toJSONSchema`).
 - La API rechaza `httpOptions.timeout` < 10 s → se usa `abortSignal` a 7 s. Latencia medida ≈ 1 s.
 - Plan gratuito: límite por minuto (429 al hacer ~40 llamadas seguidas). El reloj pide frases solo al cambiar de situación (caché + ≥ 20 s).
-- Frases ≤ 9 palabras pedidas, ≤ 12 palabras / 56 caracteres aceptadas (`MAX_CARACTERES`, 2 líneas en el reloj de 192 dp; además la app reduce la letra hasta 11 sp antes de cortar). El servidor pone mayúscula inicial.
-- La clave vive solo en `servidor/.env.local` (ignorado) y en Vercel (variable sensible de producción).
-- Vercel: el proyecto `brasa-servidor` está vinculado al repo de GitHub con **Root Directory = "servidor"**, así que un push a `main` despliega el servidor (con Root Directory "." se desplegaba la raíz Android y las rutas daban 404; incidente del 23-nov). Con ese Root Directory la CLI **no puede desplegar desde dentro de `servidor/`**: se despliega desde la raíz del repo con `npx vercel --prod --yes` (usa `.vercel/project.json` de la raíz, copia del de `servidor/.vercel/`; ambos ignorados por git). Si la carpeta cambia de nombre, cambiar también el Root Directory: `MSYS_NO_PATHCONV=1 npx vercel api /v9/projects/brasa-servidor -X PATCH -f rootDirectory=<carpeta> --raw`.
+- Frases ≤ 9 palabras pedidas, ≤ 12 palabras / 56 caracteres aceptadas (`MAX_CHARS`, 2 líneas en el reloj de 192 dp; además la app reduce la letra hasta 11 sp antes de cortar). El servidor pone mayúscula inicial.
+- La clave vive solo en `server/.env.local` (ignorado) y en Vercel (variable sensible de producción).
+- Vercel: el proyecto `brasa-servidor` está vinculado al repo de GitHub con **Root Directory = "servidor"**, así que un push a `main` despliega el servidor (con Root Directory "." se desplegaba la raíz Android y las rutas daban 404; incidente del 23-nov). Con ese Root Directory la CLI **no puede desplegar desde dentro de `servidor/`**: se despliega desde la raíz del repo con `npx vercel --prod --yes` (usa `.vercel/project.json` de la raíz, copia del de `servidor/.vercel/`; ambos ignorados por git). Si la carpeta cambia de nombre, cambiar también el Root Directory: `MSYS_NO_PATHCONV=1 npx vercel api /v9/projects/brasa-servidor -X PATCH -f rootDirectory=<carpeta> --raw`. **Pendiente (24-nov):** en la rama `codigo-en-ingles` la carpeta ya se llama `server/`, pero el Root Directory en Vercel sigue en "servidor"; cambiarlo a "server" justo antes de unir esa rama a `main`.
 
 ## Dónde quedamos (23-nov-2026)
-Versión 1.0.0 terminada y **ya unida a `main`** (23-nov-2026): `main` y `mejoras-v1` apuntan al mismo commit y GitHub muestra la 1.0.0 por defecto. 170 pruebas de la app + 17 del servidor en verde; servidor en producción; APK en `entrega/Brasa-1.0.0.apk` (debug: incluye el simulador adb para la demo).
+Versión 1.0.0 terminada y **ya unida a `main`** (23-nov-2026): `main` y `mejoras-v1` apuntan al mismo commit y GitHub muestra la 1.0.0 por defecto. 170 pruebas de la app + 18 del servidor en verde; servidor en producción; APK en `entrega/Brasa-1.0.0.apk` (debug: incluye el simulador adb para la demo).
+Código en inglés (24-nov-2026) en la rama `codigo-en-ingles`, sin unir a `main`: carpetas, archivos, clases, funciones, variables y pruebas en inglés; comentarios, textos de la interfaz, claves guardadas, campos JSON y rutas del servidor siguen en español. Tabla en `docs/renombres-codigo.md`.
 Pendiente del usuario: probar en un reloj real, TalkBack y fuente grande (ver docs/QA.md ⬜), y rotar la clave de Gemini después de la entrega.
 
 ## Cómo retomar
 - Abrir la carpeta `C:\dev\brasa` en VS Code y abrir Claude Code ahí.
 - Emulador: `%LOCALAPPDATA%\Android\Sdk\emulator\emulator.exe -avd Brasa_Wear_Redondo`
-- Servidor local: `cd servidor && npm run dev` (puerto 3000; si "EADDRINUSE", cerrar el node viejo).
+- Servidor local: `cd server && npm run dev` (puerto 3000; si "EADDRINUSE", cerrar el node viejo).
 
 ## Reglas de trabajo y lecciones aprendidas
 - Respetar todas las reglas de este archivo: tokens en Tokens.kt, sin Modifier.blur, sin strings en el código (es y en), privacidad, no es dispositivo médico.
 - No cambiar la dirección de arte, la mascota, la arquitectura ni las versiones de librerías. No agregar funciones que no se pidan.
-- NUNCA abrir, leer, buscar ni mostrar claves: ni servidor/.env.local, ni notas o archivos de texto del usuario, ni variables con claves. Para usarlas, pasarlas por comandos que no impriman el valor.
+- NUNCA abrir, leer, buscar ni mostrar claves: ni server/.env.local, ni notas o archivos de texto del usuario, ni variables con claves. Para usarlas, pasarlas por comandos que no impriman el valor.
 - Trabajar en la rama "mejoras-v1". Commits en español tras cada paso que compile y pase pruebas.
 - Después de cada paso: ./gradlew :app:assembleDebug (sin -q), ./gradlew :app:testDebugUnitTest y ./gradlew :app:verifyRoborazziDebug (record solo si el cambio visual es intencional, revisando las capturas). Si algo se rompe, revertir.
 - Si se necesita algo del usuario, detenerse y decirle exactamente qué hacer, en pasos simples.
