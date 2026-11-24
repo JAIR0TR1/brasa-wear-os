@@ -41,7 +41,7 @@ class ServerOfflineTest {
     return "http://127.0.0.1:${s.address.port}"
   }
 
-  private fun requestPermissions(c: ServerClient) = runBlocking {
+  private fun fetchPhrase(c: ServerClient) = runBlocking {
     c.message("3f6c2a1e-9b4d-4c7a-8e21-5d0b9a7f1c33", "es", Situation.TENSION, ActivityLevel.MEDIUM, "inquieta", "llama")
   }
 
@@ -51,30 +51,30 @@ class ServerOfflineTest {
   @Test fun noUrlConfiguredDoesNothingAndReturnsNull() {
     val c = ServerClient("")
     assertTrue(!c.configured)
-    assertTrue(measureTimeMs { assertNull(requestPermissions(c)) } < 100)
+    assertTrue(measureTimeMs { assertNull(fetchPhrase(c)) } < 100)
   }
 
   @Test fun serverDownReturnsNullQuickly() {
     // Un puerto libre en el que no escucha nadie: conexión rechazada.
     val port = ServerSocket(0).use { it.localPort }
-    val ms = measureTimeMs { assertNull(requestPermissions(ServerClient("http://127.0.0.1:$port"))) }
+    val ms = measureTimeMs { assertNull(fetchPhrase(ServerClient("http://127.0.0.1:$port"))) }
     assertTrue("tardó $ms ms", ms < 4_000)
   }
 
   @Test fun noInternetUnknownHostReturnsNull() {
-    assertNull(requestPermissions(ServerClient("https://brasa-servidor.invalid")))
+    assertNull(fetchPhrase(ServerClient("https://brasa-servidor.invalid")))
   }
 
   @Test fun serverErrorReturnsNull() {
-    assertNull(requestPermissions(ServerClient(fakeServer(500, """{"error":{"codigo":"interno"}}"""))))
-    assertNull(requestPermissions(ServerClient(fakeServer(429, """{"error":{"codigo":"demasiadas_peticiones"}}"""))))
+    assertNull(fetchPhrase(ServerClient(fakeServer(500, """{"error":{"codigo":"interno"}}"""))))
+    assertNull(fetchPhrase(ServerClient(fakeServer(429, """{"error":{"codigo":"demasiadas_peticiones"}}"""))))
   }
 
   @Test fun malformedResponseReturnsNull() {
-    assertNull(requestPermissions(ServerClient(fakeServer(200, "<html>no es json</html>"))))
+    assertNull(fetchPhrase(ServerClient(fakeServer(200, "<html>no es json</html>"))))
   }
 
   @Test fun validResponseReturnsThePhrase() {
-    assertEquals("Respira conmigo.", requestPermissions(ServerClient(fakeServer(200, """{"frase":"Respira conmigo.","origen":"ia"}"""))))
+    assertEquals("Respira conmigo.", fetchPhrase(ServerClient(fakeServer(200, """{"frase":"Respira conmigo.","origen":"ia"}"""))))
   }
 }
