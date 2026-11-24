@@ -1,4 +1,4 @@
-package com.brasa.app.ui.componentes
+package com.brasa.app.ui.components
 
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -18,41 +18,41 @@ import androidx.wear.compose.foundation.CurvedTextStyle
 import androidx.wear.compose.foundation.basicCurvedText
 import androidx.wear.compose.foundation.padding
 import androidx.wear.compose.material3.Text
-import com.brasa.app.ui.theme.BrasaTema
-import com.brasa.app.ui.theme.Tipo
+import com.brasa.app.ui.theme.BrasaTheme
+import com.brasa.app.ui.theme.BrasaType
 import com.brasa.app.ui.theme.Tokens
 
 /**
  * Título superior que sigue el borde: curvo en pantallas redondas, recto y centrado en cuadradas.
  */
 @Composable
-fun TituloBorde(
-  texto: String,
-  color: Color = BrasaTema.colores.textoSecundario,
-  margen: androidx.compose.ui.unit.Dp = Tokens.Espacio.s,
+fun EdgeTitle(
+  text: String,
+  color: Color = BrasaTheme.colors.secondaryText,
+  margin: androidx.compose.ui.unit.Dp = Tokens.Spacing.s,
   /** true: TalkBack lo anuncia como encabezado de la pantalla (false para la hora de Inicio). */
-  encabezado: Boolean = true,
+  isHeading: Boolean = true,
 ) {
-  val t = texto.uppercase()
+  val t = text.uppercase()
   // TalkBack lee el texto original (no en mayúsculas, que algunas voces deletrean).
-  val semantica = Modifier.clearAndSetSemantics {
-    contentDescription = texto
-    if (encabezado) heading()
+  val semanticsModifier = Modifier.clearAndSetSemantics {
+    contentDescription = text
+    if (isHeading) heading()
   }
   if (LocalConfiguration.current.isScreenRound) {
-    CurvedLayout(Modifier.fillMaxSize().then(semantica), anchor = 270f) {
+    CurvedLayout(Modifier.fillMaxSize().then(semanticsModifier), anchor = 270f) {
       basicCurvedText(
         t,
-        modifier = CurvedModifier.padding(margen),
+        modifier = CurvedModifier.padding(margin),
         style = CurvedTextStyle(
-          fontSize = Tipo.curvo.fontSize, fontFamily = Tipo.curvo.fontFamily, fontWeight = Tipo.curvo.fontWeight,
-          color = color, letterSpacing = Tipo.curvo.letterSpacing,
+          fontSize = BrasaType.curved.fontSize, fontFamily = BrasaType.curved.fontFamily, fontWeight = BrasaType.curved.fontWeight,
+          color = color, letterSpacing = BrasaType.curved.letterSpacing,
         ),
       )
     }
   } else {
-    Box(Modifier.fillMaxSize().padding(top = margen), contentAlignment = Alignment.TopCenter) {
-      Text(t, style = Tipo.curvo, color = color, maxLines = 1, modifier = semantica)
+    Box(Modifier.fillMaxSize().padding(top = margin), contentAlignment = Alignment.TopCenter) {
+      Text(t, style = BrasaType.curved, color = color, maxLines = 1, modifier = semanticsModifier)
     }
   }
 }

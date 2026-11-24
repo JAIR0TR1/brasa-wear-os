@@ -10,8 +10,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
-import com.brasa.app.ui.brasa.Etapa
-import com.brasa.app.ui.pantallas.SubidaNivel
+import com.brasa.app.ui.brasa.Stage
+import com.brasa.app.ui.screens.LevelUp
 import com.brasa.app.ui.theme.BrasaTheme
 import com.github.takahirom.roborazzi.captureRoboImage
 import org.junit.Rule
@@ -23,43 +23,43 @@ import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
 
 /** Pantallas nuevas de la versión 1.0.0 (todas en las 6 variantes). */
-val pantallasV1 = listOf("subida-nivel-estallido", "subida-nivel-etapa", "subida-nivel")
+val v1Screens = listOf("subida-nivel-estallido", "subida-nivel-etapa", "subida-nivel")
 
 @Composable
-fun ContenidoV1(nombre: String) {
-  when (nombre) {
-    "subida-nivel-estallido" -> SubidaNivel(10, Etapa.FOGATA, etapaNueva = true, onFin = {}, progresoFijo = 0.22f)
-    "subida-nivel-etapa" -> SubidaNivel(10, Etapa.FOGATA, etapaNueva = true, onFin = {}, progresoFijo = 0.6f)
-    else -> SubidaNivel(8, Etapa.LLAMA, etapaNueva = false, onFin = {}, progresoFijo = 0.6f)
+fun V1Content(name: String) {
+  when (name) {
+    "subida-nivel-estallido" -> LevelUp(10, Stage.BONFIRE, newStage = true, onFinish = {}, fixedProgress = 0.22f)
+    "subida-nivel-etapa" -> LevelUp(10, Stage.BONFIRE, newStage = true, onFinish = {}, fixedProgress = 0.6f)
+    else -> LevelUp(8, Stage.FLAME, newStage = false, onFinish = {}, fixedProgress = 0.6f)
   }
 }
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [34])
-class CapturasV1(private val pantalla: Int, private val variante: Variante) {
+class ScreenshotsV1(private val screen: Int, private val variant: Variant) {
 
   companion object {
     @JvmStatic
     @ParameterizedRobolectricTestRunner.Parameters(name = "{0}-{1}")
-    fun casos(): List<Array<Any>> = pantallasV1.indices.flatMap { p -> variantes.map { arrayOf<Any>(p, it) } }
+    fun cases(): List<Array<Any>> = v1Screens.indices.flatMap { p -> variants.map { arrayOf<Any>(p, it) } }
   }
 
   @get:Rule val compose = createComposeRule()
 
   @Test
-  fun captura() {
-    RuntimeEnvironment.setQualifiers(variante.calificadores)
-    RuntimeEnvironment.setFontScale(variante.escalaFuente)
-    val nombre = pantallasV1[pantalla]
+  fun capture() {
+    RuntimeEnvironment.setQualifiers(variant.qualifiers)
+    RuntimeEnvironment.setFontScale(variant.fontScale)
+    val name = v1Screens[screen]
     compose.setContent {
-      BrasaTheme(oscuro = variante.oscuro) {
+      BrasaTheme(dark = variant.dark) {
         Box(
           Modifier.fillMaxSize().background(Color(0xFF141414))
-            .then(if (variante.redondo) Modifier.clip(CircleShape) else Modifier),
-        ) { ContenidoV1(nombre) }
+            .then(if (variant.round) Modifier.clip(CircleShape) else Modifier),
+        ) { V1Content(name) }
       }
     }
-    compose.onRoot().captureRoboImage("../docs/capturas/roborazzi/v1/${variante.nombre}/$nombre.png")
+    compose.onRoot().captureRoboImage("../docs/capturas/roborazzi/v1/${variant.name}/$name.png")
   }
 }

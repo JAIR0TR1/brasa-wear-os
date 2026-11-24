@@ -20,10 +20,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
-import com.brasa.app.ui.pantallas.Evolucion
-import com.brasa.app.ui.pantallas.GraficaPasos
-import com.brasa.app.ui.pantallas.GraficaPulso
-import com.brasa.app.ui.pantallas.GraficaSemana
+import com.brasa.app.ui.screens.Evolution
+import com.brasa.app.ui.screens.StepsChart
+import com.brasa.app.ui.screens.HeartRateChart
+import com.brasa.app.ui.screens.WeekChart
 import kotlinx.coroutines.launch
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
@@ -32,24 +32,24 @@ import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import com.brasa.app.BrasaViewModel
-import com.brasa.app.EstadoBrasa
-import com.brasa.app.data.Ajustes
-import com.brasa.app.Celebracion
-import com.brasa.app.ui.pantallas.SubidaNivel
-import com.brasa.app.data.permisosSalud
-import com.brasa.app.ui.pantallas.Permisos
-import com.brasa.app.ui.pantallas.AccionesAjustes
-import com.brasa.app.ui.pantallas.AjustesPantalla
-import com.brasa.app.ui.pantallas.Arranque
-import com.brasa.app.ui.pantallas.IndicadorPaginas
-import com.brasa.app.ui.pantallas.Inicio
-import com.brasa.app.ui.pantallas.Respirar
+import com.brasa.app.BrasaState
+import com.brasa.app.data.AppSettings
+import com.brasa.app.Celebration
+import com.brasa.app.ui.screens.LevelUp
+import com.brasa.app.data.healthPermissions
+import com.brasa.app.ui.screens.Permissions
+import com.brasa.app.ui.screens.SettingsActions
+import com.brasa.app.ui.screens.SettingsScreen
+import com.brasa.app.ui.screens.StartupAnimation
+import com.brasa.app.ui.screens.PageIndicator
+import com.brasa.app.ui.screens.Home
+import com.brasa.app.ui.screens.Breathe
 import com.brasa.app.ui.theme.BrasaTheme
 import com.brasa.app.ui.theme.Tokens
 
-private const val PRINCIPAL = "principal"
-private const val RESPIRAR = "respirar"
-private const val PAGINAS = 6
+private const val MAIN = "principal"
+private const val BREATHE = "respirar"
+private const val PAGES = 6
 
 /**
  * Navegación: arranque → páginas principales (deslizar horizontal: Inicio · Ajustes; la fase 4 añade
@@ -57,60 +57,60 @@ private const val PAGINAS = 6
  */
 @Composable
 fun BrasaApp(vm: BrasaViewModel) {
-  val ajustes by vm.ajustes.collectAsStateWithLifecycle()
-  val estado by vm.estado.collectAsStateWithLifecycle()
-  val pedirPermisos by vm.pedirPermisos.collectAsStateWithLifecycle()
-  val lanzador = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-    vm.permisosRespondidos()
+  val settings by vm.settings.collectAsStateWithLifecycle()
+  val state by vm.state.collectAsStateWithLifecycle()
+  val askPermissions by vm.askPermissions.collectAsStateWithLifecycle()
+  val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+    vm.permissionsAnswered()
   }
-  val pedir = { lanzador.launch(permisosSalud) }
-  var arrancado by rememberSaveable { mutableStateOf(false) }
+  val requestPermissions = { launcher.launch(healthPermissions) }
+  var started by rememberSaveable { mutableStateOf(false) }
 
   // Meta cumplida o subida de nivel: vibración de celebración; el nivel además tiene su animación.
-  var subida by remember { mutableStateOf<Celebracion.Nivel?>(null) }
-  val haptica = rememberHaptica()
+  var levelUpEvent by remember { mutableStateOf<Celebration.Level?>(null) }
+  val haptics = rememberHaptics()
   LaunchedEffect(Unit) {
-    vm.celebraciones.collect { c ->
-      haptica.celebrar()
-      if (c is Celebracion.Nivel) subida = c
+    vm.celebrations.collect { c ->
+      haptics.celebrate()
+      if (c is Celebration.Level) levelUpEvent = c
     }
   }
 
-  BrasaTheme(oscuro = ajustes.oscuro) {
+  BrasaTheme(dark = settings.dark) {
    Box(Modifier.fillMaxSize()) {
-    Crossfade(arrancado, animationSpec = tween(Tokens.Duracion.media), label = "arranque") { listo ->
-      if (!listo) {
-        Arranque(onFin = { arrancado = true })
-      } else if (pedirPermisos) {
-        Permisos(onPermitir = pedir, onAhoraNo = vm::permisosRespondidos)
+    Crossfade(started, animationSpec = tween(Tokens.Duration.medium), label = "arranque") { ready ->
+      if (!ready) {
+        StartupAnimation(onFinish = { started = true })
+      } else if (askPermissions) {
+        Permissions(onAllow = requestPermissions, onNotNow = vm::permissionsAnswered)
       } else {
         val nav = rememberSwipeDismissableNavController()
-        SwipeDismissableNavHost(nav, startDestination = PRINCIPAL) {
-          composable(PRINCIPAL) {
-            PaginasPrincipales(
-              estado, ajustes,
-              AccionesAjustes(
-                tema = { vm.tema(it) }, demo = { vm.demo(it) },
-                emocion = { vm.emocionDemo(it) }, etapa = { vm.etapaDemo(it) }, permisos = pedir,
+        SwipeDismissableNavHost(nav, startDestination = MAIN) {
+          composable(MAIN) {
+            MainPages(
+              state, settings,
+              SettingsActions(
+                theme = { vm.theme(it) }, demo = { vm.demo(it) },
+                emotion = { vm.demoEmotion(it) }, stage = { vm.demoStage(it) }, permissions = requestPermissions,
               ),
-              onTocarBrasa = vm::tocarBrasa, onRespirar = { nav.navigate(RESPIRAR) },
+              onTapBrasa = vm::tapBrasa, onBreathe = { nav.navigate(BREATHE) },
             )
           }
-          composable(RESPIRAR) {
+          composable(BREATHE) {
             // Se fija al entrar: el "antes" no cambia durante el ejercicio.
-            val antes = androidx.compose.runtime.remember { vm.pulsoAntesRespirar() }
-            Respirar(
-              etapa = estado.etapa,
-              pulsoAntes = antes,
-              pulsoDespues = vm::pulsoDespuesRespirar,
-              onCompletado = vm::respiroCompletado,
-              onListo = { nav.popBackStack() },
+            val before = androidx.compose.runtime.remember { vm.heartRateBeforeBreathing() }
+            Breathe(
+              stage = state.stage,
+              heartRateBefore = before,
+              heartRateAfter = vm::heartRateAfterBreathing,
+              onCompleted = vm::breathCompleted,
+              onReady = { nav.popBackStack() },
             )
           }
         }
       }
     }
-    subida?.let { SubidaNivel(it.nivel, it.etapa, it.etapaNueva, onFin = { subida = null }) }
+    levelUpEvent?.let { LevelUp(it.level, it.stage, it.newStage, onFinish = { levelUpEvent = null }) }
    }
   }
 }
@@ -120,46 +120,46 @@ fun BrasaApp(vm: BrasaViewModel) {
  * Evolución · Ajustes. En Ajustes la corona desplaza la lista en lugar de cambiar de página.
  */
 @Composable
-fun PaginasPrincipales(
-  estado: EstadoBrasa,
-  ajustes: Ajustes,
-  acciones: AccionesAjustes,
-  onTocarBrasa: () -> Unit,
-  onRespirar: () -> Unit,
-  paginaInicial: Int = 0,
+fun MainPages(
+  state: BrasaState,
+  settings: AppSettings,
+  actions: SettingsActions,
+  onTapBrasa: () -> Unit,
+  onBreathe: () -> Unit,
+  initialPage: Int = 0,
 ) {
-  val paginas = rememberPagerState(initialPage = paginaInicial) { PAGINAS }
-  val alcance = rememberCoroutineScope()
-  val foco = remember { FocusRequester() }
-  var acumulado by remember { mutableFloatStateOf(0f) }
+  val pages = rememberPagerState(initialPage = initialPage) { PAGES }
+  val scope = rememberCoroutineScope()
+  val focus = remember { FocusRequester() }
+  var accumulated by remember { mutableFloatStateOf(0f) }
   Box(
     Modifier
       .fillMaxSize()
       // Corona / bisel giratorio: pasa de página entre Inicio, gráficas y evolución.
       .onRotaryScrollEvent { e ->
-        if (paginas.currentPage == PAGINAS - 1) return@onRotaryScrollEvent false
-        acumulado += e.verticalScrollPixels
-        if (kotlin.math.abs(acumulado) > 60f) {
-          val destino = (paginas.currentPage + if (acumulado > 0) 1 else -1).coerceIn(0, PAGINAS - 1)
-          acumulado = 0f
-          alcance.launch { paginas.animateScrollToPage(destino) }
+        if (pages.currentPage == PAGES - 1) return@onRotaryScrollEvent false
+        accumulated += e.verticalScrollPixels
+        if (kotlin.math.abs(accumulated) > 60f) {
+          val target = (pages.currentPage + if (accumulated > 0) 1 else -1).coerceIn(0, PAGES - 1)
+          accumulated = 0f
+          scope.launch { pages.animateScrollToPage(target) }
         }
         true
       }
-      .focusRequester(foco)
+      .focusRequester(focus)
       .focusable(),
   ) {
-    LaunchedEffect(Unit) { foco.requestFocus() }
-    HorizontalPager(paginas, Modifier.fillMaxSize(), beyondViewportPageCount = 0) { i ->
+    LaunchedEffect(Unit) { focus.requestFocus() }
+    HorizontalPager(pages, Modifier.fillMaxSize(), beyondViewportPageCount = 0) { i ->
       when (i) {
-        0 -> Inicio(estado, onTocarBrasa = onTocarBrasa, onRespirar = onRespirar)
-        1 -> GraficaPasos(estado)
-        2 -> GraficaPulso(estado)
-        3 -> GraficaSemana(estado, fraseMeta = estado.fraseMeta)
-        4 -> Evolucion(estado)
-        else -> AjustesPantalla(ajustes, acciones, fuente = estado.fuente)
+        0 -> Home(state, onTapBrasa = onTapBrasa, onBreathe = onBreathe)
+        1 -> StepsChart(state)
+        2 -> HeartRateChart(state)
+        3 -> WeekChart(state, goalPhrase = state.goalPhrase)
+        4 -> Evolution(state)
+        else -> SettingsScreen(settings, actions, source = state.source)
       }
     }
-    IndicadorPaginas(total = PAGINAS, actual = paginas.currentPage)
+    PageIndicator(total = PAGES, current = pages.currentPage)
   }
 }

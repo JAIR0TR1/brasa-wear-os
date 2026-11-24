@@ -38,11 +38,11 @@ val JetBrainsMono = FontFamily(
 )
 
 /** Escala tipográfica de Brasa (sp: respeta el tamaño de fuente del sistema). */
-object Tipo {
-  val cifra = TextStyle(fontFamily = SpaceGrotesk, fontWeight = FontWeight.Bold, fontSize = 30.sp, letterSpacing = (-0.02).em)
-  val titulo = TextStyle(fontFamily = SpaceGrotesk, fontWeight = FontWeight.Bold, fontSize = 18.sp, letterSpacing = (-0.01).em, textAlign = TextAlign.Center)
-  val etiqueta = TextStyle(fontFamily = SpaceGrotesk, fontWeight = FontWeight.Medium, fontSize = 13.sp, textAlign = TextAlign.Center)
-  val voz = TextStyle(fontFamily = Fraunces, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 17.sp, textAlign = TextAlign.Center)
-  val dato = TextStyle(fontFamily = JetBrainsMono, fontWeight = FontWeight.Normal, fontSize = 11.sp, letterSpacing = 0.02.em, textAlign = TextAlign.Center)
-  val curvo = TextStyle(fontFamily = SpaceGrotesk, fontWeight = FontWeight.Medium, fontSize = 12.sp, letterSpacing = 0.08.em)
+object BrasaType {
+  val figure = TextStyle(fontFamily = SpaceGrotesk, fontWeight = FontWeight.Bold, fontSize = 30.sp, letterSpacing = (-0.02).em)
+  val title = TextStyle(fontFamily = SpaceGrotesk, fontWeight = FontWeight.Bold, fontSize = 18.sp, letterSpacing = (-0.01).em, textAlign = TextAlign.Center)
+  val label = TextStyle(fontFamily = SpaceGrotesk, fontWeight = FontWeight.Medium, fontSize = 13.sp, textAlign = TextAlign.Center)
+  val voice = TextStyle(fontFamily = Fraunces, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 17.sp, textAlign = TextAlign.Center)
+  val data = TextStyle(fontFamily = JetBrainsMono, fontWeight = FontWeight.Normal, fontSize = 11.sp, letterSpacing = 0.02.em, textAlign = TextAlign.Center)
+  val curved = TextStyle(fontFamily = SpaceGrotesk, fontWeight = FontWeight.Medium, fontSize = 12.sp, letterSpacing = 0.08.em)
 }

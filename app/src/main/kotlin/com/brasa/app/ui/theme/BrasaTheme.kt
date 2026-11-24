@@ -10,54 +10,54 @@ import androidx.wear.compose.material3.MaterialTheme
 
 /** Colores semánticos del tema activo. */
 @Immutable
-data class ColoresBrasa(
-  val oscuro: Boolean,
-  val fondo: Color,
-  val texto: Color,
-  val textoSecundario: Color,
-  val fuego: Color,
+data class BrasaColors(
+  val dark: Boolean,
+  val background: Color,
+  val text: Color,
+  val secondaryText: Color,
+  val fire: Color,
   /** Pista de los anillos (track), muy sutil. */
-  val pista: Color,
+  val track: Color,
 )
 
-val ColoresOscuros = ColoresBrasa(
-  oscuro = true,
-  fondo = Tokens.Colores.Negro,
-  texto = Tokens.Colores.Texto,
-  textoSecundario = Tokens.Colores.TextoSecundario,
-  fuego = Tokens.Colores.Fuego,
-  pista = Color(0x1FFFF3E6),
+val DarkColors = BrasaColors(
+  dark = true,
+  background = Tokens.Colors.Black,
+  text = Tokens.Colors.TextPrimary,
+  secondaryText = Tokens.Colors.SecondaryText,
+  fire = Tokens.Colors.Fire,
+  track = Color(0x1FFFF3E6),
 )
 
-val ColoresClaros = ColoresBrasa(
-  oscuro = false,
-  fondo = Tokens.Colores.FondoClaro,
-  texto = Tokens.Colores.TextoClaro,
-  textoSecundario = Tokens.Colores.TextoSecundarioClaro,
-  fuego = Tokens.Colores.FuegoClaroTema,
-  pista = Color(0x1A2A1408),
+val LightColors = BrasaColors(
+  dark = false,
+  background = Tokens.Colors.LightBackground,
+  text = Tokens.Colors.LightText,
+  secondaryText = Tokens.Colors.LightSecondaryText,
+  fire = Tokens.Colors.LightThemeFire,
+  track = Color(0x1A2A1408),
 )
 
-val LocalColoresBrasa = staticCompositionLocalOf { ColoresOscuros }
+val LocalBrasaColors = staticCompositionLocalOf { DarkColors }
 
-object BrasaTema {
-  val colores: ColoresBrasa
-    @Composable get() = LocalColoresBrasa.current
+object BrasaTheme {
+  val colors: BrasaColors
+    @Composable get() = LocalBrasaColors.current
 }
 
 /** Tema de Brasa: personaliza el MaterialTheme de Wear con los tokens (nunca Material por defecto). */
 @Composable
-fun BrasaTheme(oscuro: Boolean = true, content: @Composable () -> Unit) {
-  val c = if (oscuro) ColoresOscuros else ColoresClaros
-  val esquema = ColorScheme(
-    primary = c.fuego,
-    onPrimary = if (oscuro) Tokens.Colores.Negro else Tokens.Colores.Blanco,
-    background = c.fondo,
-    onBackground = c.texto,
-    onSurface = c.texto,
-    onSurfaceVariant = c.textoSecundario,
+fun BrasaTheme(dark: Boolean = true, content: @Composable () -> Unit) {
+  val c = if (dark) DarkColors else LightColors
+  val scheme = ColorScheme(
+    primary = c.fire,
+    onPrimary = if (dark) Tokens.Colors.Black else Tokens.Colors.White,
+    background = c.background,
+    onBackground = c.text,
+    onSurface = c.text,
+    onSurfaceVariant = c.secondaryText,
   )
-  CompositionLocalProvider(LocalColoresBrasa provides c) {
-    MaterialTheme(colorScheme = esquema, content = content)
+  CompositionLocalProvider(LocalBrasaColors provides c) {
+    MaterialTheme(colorScheme = scheme, content = content)
   }
 }

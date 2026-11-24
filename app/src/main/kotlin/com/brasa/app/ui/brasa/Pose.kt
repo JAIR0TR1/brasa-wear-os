@@ -5,14 +5,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import com.brasa.app.ui.theme.Tokens
 
-enum class Emocion { APAGADA, INQUIETA, TRANQUILA, FELIZ, EUFORICA }
+/** [key] es el valor histórico que se guarda en preferencias y que (en minúsculas) entiende el servidor: no cambiar. */
+enum class Emotion(val key: String) {
+  DIM("APAGADA"), RESTLESS("INQUIETA"), CALM("TRANQUILA"), HAPPY("FELIZ"), ECSTATIC("EUFORICA"),
+}
 
 /** Etapas de evolución por nivel. */
-enum class Etapa(val nivelMinimo: Int) {
-  CHISPA(1), LLAMA(5), FOGATA(10), LEYENDA(20);
+/** [key]: igual que en Emocion, valor histórico para preferencias y servidor. */
+enum class Stage(val minLevel: Int, val key: String) {
+  SPARK(1, "CHISPA"), FLAME(5, "LLAMA"), BONFIRE(10, "FOGATA"), LEGEND(20, "LEYENDA");
 
   companion object {
-    fun deNivel(nivel: Int): Etapa = entries.last { nivel >= it.nivelMinimo }
+    fun fromLevel(level: Int): Stage = entries.last { level >= it.minLevel }
   }
 }
 
@@ -24,93 +28,93 @@ enum class Etapa(val nivelMinimo: Int) {
 @Immutable
 data class Pose(
   val base: Color,
-  val nucleo: Color,
-  val borde: Color,
-  val escala: Float,
-  val ojoAbierto: Float,
-  val ojoFeliz: Float,
-  val ojoCaido: Float,
-  val ceja: Float,
-  val cejaVisible: Float,
-  val boca: Float,
-  val bocaAbierta: Float,
-  val bocaTemblor: Float,
-  val mejillas: Float,
-  val brazoIzq: Float,
-  val brazoDer: Float,
-  val saludo: Float,
-  val balanceo: Float,
+  val core: Color,
+  val edge: Color,
+  val scale: Float,
+  val eyeOpen: Float,
+  val happyEye: Float,
+  val droopyEye: Float,
+  val brow: Float,
+  val browVisible: Float,
+  val mouth: Float,
+  val mouthOpen: Float,
+  val mouthTremble: Float,
+  val cheeks: Float,
+  val leftArm: Float,
+  val rightArm: Float,
+  val wave: Float,
+  val sway: Float,
   val flotaAmp: Float,
   val flotaVel: Float,
-  val salto: Float,
-  val temblor: Float,
-  val avivar: Float,
-  val lagrima: Float,
-  val sudor: Float,
-  val chispas: Float,
-  val brillo: Float,
+  val jump: Float,
+  val tremble: Float,
+  val stoke: Float,
+  val tear: Float,
+  val sweat: Float,
+  val sparks: Float,
+  val glow: Float,
 )
 
 /** Forma por etapa de evolución (se interpola igual que la pose). */
 @Immutable
-data class Forma(
-  val escala: Float,
-  val punta: Float,
-  val extremidades: Float,
-  val laterales: Float,
-  val corona: Float,
-  val orbita: Float,
+data class BrasaShape(
+  val scale: Float,
+  val tip: Float,
+  val limbs: Float,
+  val sideFlames: Float,
+  val crown: Float,
+  val orbit: Float,
 )
 
-fun formaDe(etapa: Etapa): Forma = when (etapa) {
-  Etapa.CHISPA -> Forma(escala = 0.74f, punta = 0.22f, extremidades = 0.82f, laterales = 0f, corona = 0f, orbita = 0f)
-  Etapa.LLAMA -> Forma(escala = 0.9f, punta = 1f, extremidades = 1f, laterales = 0f, corona = 0f, orbita = 0f)
-  Etapa.FOGATA -> Forma(escala = 0.98f, punta = 1.08f, extremidades = 1f, laterales = 1f, corona = 0f, orbita = 0f)
-  Etapa.LEYENDA -> Forma(escala = 0.96f, punta = 1.12f, extremidades = 1f, laterales = 1f, corona = 1f, orbita = 1f)
+fun shapeFor(stage: Stage): BrasaShape = when (stage) {
+  Stage.SPARK -> BrasaShape(scale = 0.74f, tip = 0.22f, limbs = 0.82f, sideFlames = 0f, crown = 0f, orbit = 0f)
+  Stage.FLAME -> BrasaShape(scale = 0.9f, tip = 1f, limbs = 1f, sideFlames = 0f, crown = 0f, orbit = 0f)
+  Stage.BONFIRE -> BrasaShape(scale = 0.98f, tip = 1.08f, limbs = 1f, sideFlames = 1f, crown = 0f, orbit = 0f)
+  Stage.LEGEND -> BrasaShape(scale = 0.96f, tip = 1.12f, limbs = 1f, sideFlames = 1f, crown = 1f, orbit = 1f)
 }
 
-fun poseDe(emocion: Emocion): Pose {
-  val p = Tokens.paleta(emocion, oscuro = true)
-  return when (emocion) {
-    Emocion.APAGADA -> Pose(
-      p.base, p.nucleo, p.borde, escala = 0.84f,
-      ojoAbierto = 0.85f, ojoFeliz = 0f, ojoCaido = 0.62f, ceja = 0.7f, cejaVisible = 0.9f,
-      boca = -0.75f, bocaAbierta = 0f, bocaTemblor = 0f, mejillas = 0f,
-      brazoIzq = 6f, brazoDer = 6f, saludo = 0f, balanceo = 3f,
-      flotaAmp = 1.2f, flotaVel = 0.9f, salto = 0f, temblor = 0f, avivar = 0.25f,
-      lagrima = 1f, sudor = 0f, chispas = 0f, brillo = 0.35f,
+fun poseFor(emotion: Emotion): Pose {
+  val p = Tokens.palette(emotion, dark = true)
+  return when (emotion) {
+    Emotion.DIM -> Pose(
+      p.base, p.core, p.edge, scale = 0.84f,
+      eyeOpen = 0.85f, happyEye = 0f, droopyEye = 0.62f, brow = 0.7f, browVisible = 0.9f,
+      mouth = -0.75f, mouthOpen = 0f, mouthTremble = 0f, cheeks = 0f,
+      leftArm = 6f, rightArm = 6f, wave = 0f, sway = 3f,
+      flotaAmp = 1.2f, flotaVel = 0.9f, jump = 0f, tremble = 0f, stoke = 0.25f,
+      tear = 1f, sweat = 0f, sparks = 0f, glow = 0.35f,
     )
-    Emocion.INQUIETA -> Pose(
-      p.base, p.nucleo, p.borde, escala = 0.96f,
-      ojoAbierto = 1.32f, ojoFeliz = 0f, ojoCaido = 0f, ceja = 1f, cejaVisible = 1f,
-      boca = 0f, bocaAbierta = 0f, bocaTemblor = 1f, mejillas = 0f,
-      brazoIzq = -78f, brazoDer = -78f, saludo = 0f, balanceo = 4f,
-      flotaAmp = 1.6f, flotaVel = 2.6f, salto = 0f, temblor = 1f, avivar = 1.4f,
-      lagrima = 0f, sudor = 1f, chispas = 0f, brillo = 0.75f,
+    Emotion.RESTLESS -> Pose(
+      p.base, p.core, p.edge, scale = 0.96f,
+      eyeOpen = 1.32f, happyEye = 0f, droopyEye = 0f, brow = 1f, browVisible = 1f,
+      mouth = 0f, mouthOpen = 0f, mouthTremble = 1f, cheeks = 0f,
+      leftArm = -78f, rightArm = -78f, wave = 0f, sway = 4f,
+      flotaAmp = 1.6f, flotaVel = 2.6f, jump = 0f, tremble = 1f, stoke = 1.4f,
+      tear = 0f, sweat = 1f, sparks = 0f, glow = 0.75f,
     )
-    Emocion.TRANQUILA -> Pose(
-      p.base, p.nucleo, p.borde, escala = 0.95f,
-      ojoAbierto = 1f, ojoFeliz = 0f, ojoCaido = 0f, ceja = 0f, cejaVisible = 0f,
-      boca = 0.55f, bocaAbierta = 0f, bocaTemblor = 0f, mejillas = 0.35f,
-      brazoIzq = 26f, brazoDer = 26f, saludo = 0f, balanceo = 7f,
-      flotaAmp = 2.2f, flotaVel = 1.3f, salto = 0f, temblor = 0f, avivar = 0.7f,
-      lagrima = 0f, sudor = 0f, chispas = 0f, brillo = 0.7f,
+    Emotion.CALM -> Pose(
+      p.base, p.core, p.edge, scale = 0.95f,
+      eyeOpen = 1f, happyEye = 0f, droopyEye = 0f, brow = 0f, browVisible = 0f,
+      mouth = 0.55f, mouthOpen = 0f, mouthTremble = 0f, cheeks = 0.35f,
+      leftArm = 26f, rightArm = 26f, wave = 0f, sway = 7f,
+      flotaAmp = 2.2f, flotaVel = 1.3f, jump = 0f, tremble = 0f, stoke = 0.7f,
+      tear = 0f, sweat = 0f, sparks = 0f, glow = 0.7f,
     )
-    Emocion.FELIZ -> Pose(
-      p.base, p.nucleo, p.borde, escala = 1f,
-      ojoAbierto = 1.22f, ojoFeliz = 0f, ojoCaido = 0f, ceja = 0f, cejaVisible = 0f,
-      boca = 1f, bocaAbierta = 0.75f, bocaTemblor = 0f, mejillas = 1f,
-      brazoIzq = 34f, brazoDer = 148f, saludo = 1f, balanceo = 5f,
-      flotaAmp = 2.6f, flotaVel = 1.9f, salto = 0f, temblor = 0f, avivar = 1f,
-      lagrima = 0f, sudor = 0f, chispas = 0f, brillo = 0.9f,
+    Emotion.HAPPY -> Pose(
+      p.base, p.core, p.edge, scale = 1f,
+      eyeOpen = 1.22f, happyEye = 0f, droopyEye = 0f, brow = 0f, browVisible = 0f,
+      mouth = 1f, mouthOpen = 0.75f, mouthTremble = 0f, cheeks = 1f,
+      leftArm = 34f, rightArm = 148f, wave = 1f, sway = 5f,
+      flotaAmp = 2.6f, flotaVel = 1.9f, jump = 0f, tremble = 0f, stoke = 1f,
+      tear = 0f, sweat = 0f, sparks = 0f, glow = 0.9f,
     )
-    Emocion.EUFORICA -> Pose(
-      p.base, p.nucleo, p.borde, escala = 1.04f,
-      ojoAbierto = 1f, ojoFeliz = 1f, ojoCaido = 0f, ceja = 0f, cejaVisible = 0f,
-      boca = 1f, bocaAbierta = 1f, bocaTemblor = 0f, mejillas = 1f,
-      brazoIzq = 158f, brazoDer = 158f, saludo = 0f, balanceo = 12f,
-      flotaAmp = 1f, flotaVel = 3.2f, salto = 1f, temblor = 0f, avivar = 1.5f,
-      lagrima = 0f, sudor = 0f, chispas = 1f, brillo = 1f,
+    Emotion.ECSTATIC -> Pose(
+      p.base, p.core, p.edge, scale = 1.04f,
+      eyeOpen = 1f, happyEye = 1f, droopyEye = 0f, brow = 0f, browVisible = 0f,
+      mouth = 1f, mouthOpen = 1f, mouthTremble = 0f, cheeks = 1f,
+      leftArm = 158f, rightArm = 158f, wave = 0f, sway = 12f,
+      flotaAmp = 1f, flotaVel = 3.2f, jump = 1f, tremble = 0f, stoke = 1.5f,
+      tear = 0f, sweat = 0f, sparks = 1f, glow = 1f,
     )
   }
 }
@@ -118,18 +122,18 @@ fun poseDe(emocion: Emocion): Pose {
 private fun l(a: Float, b: Float, t: Float) = a + (b - a) * t
 
 fun lerpPose(a: Pose, b: Pose, t: Float) = Pose(
-  base = lerp(a.base, b.base, t), nucleo = lerp(a.nucleo, b.nucleo, t), borde = lerp(a.borde, b.borde, t),
-  escala = l(a.escala, b.escala, t), ojoAbierto = l(a.ojoAbierto, b.ojoAbierto, t), ojoFeliz = l(a.ojoFeliz, b.ojoFeliz, t),
-  ojoCaido = l(a.ojoCaido, b.ojoCaido, t), ceja = l(a.ceja, b.ceja, t), cejaVisible = l(a.cejaVisible, b.cejaVisible, t),
-  boca = l(a.boca, b.boca, t), bocaAbierta = l(a.bocaAbierta, b.bocaAbierta, t), bocaTemblor = l(a.bocaTemblor, b.bocaTemblor, t),
-  mejillas = l(a.mejillas, b.mejillas, t), brazoIzq = l(a.brazoIzq, b.brazoIzq, t), brazoDer = l(a.brazoDer, b.brazoDer, t),
-  saludo = l(a.saludo, b.saludo, t), balanceo = l(a.balanceo, b.balanceo, t), flotaAmp = l(a.flotaAmp, b.flotaAmp, t),
-  flotaVel = l(a.flotaVel, b.flotaVel, t), salto = l(a.salto, b.salto, t), temblor = l(a.temblor, b.temblor, t),
-  avivar = l(a.avivar, b.avivar, t), lagrima = l(a.lagrima, b.lagrima, t), sudor = l(a.sudor, b.sudor, t),
-  chispas = l(a.chispas, b.chispas, t), brillo = l(a.brillo, b.brillo, t),
+  base = lerp(a.base, b.base, t), core = lerp(a.core, b.core, t), edge = lerp(a.edge, b.edge, t),
+  scale = l(a.scale, b.scale, t), eyeOpen = l(a.eyeOpen, b.eyeOpen, t), happyEye = l(a.happyEye, b.happyEye, t),
+  droopyEye = l(a.droopyEye, b.droopyEye, t), brow = l(a.brow, b.brow, t), browVisible = l(a.browVisible, b.browVisible, t),
+  mouth = l(a.mouth, b.mouth, t), mouthOpen = l(a.mouthOpen, b.mouthOpen, t), mouthTremble = l(a.mouthTremble, b.mouthTremble, t),
+  cheeks = l(a.cheeks, b.cheeks, t), leftArm = l(a.leftArm, b.leftArm, t), rightArm = l(a.rightArm, b.rightArm, t),
+  wave = l(a.wave, b.wave, t), sway = l(a.sway, b.sway, t), flotaAmp = l(a.flotaAmp, b.flotaAmp, t),
+  flotaVel = l(a.flotaVel, b.flotaVel, t), jump = l(a.jump, b.jump, t), tremble = l(a.tremble, b.tremble, t),
+  stoke = l(a.stoke, b.stoke, t), tear = l(a.tear, b.tear, t), sweat = l(a.sweat, b.sweat, t),
+  sparks = l(a.sparks, b.sparks, t), glow = l(a.glow, b.glow, t),
 )
 
-fun lerpForma(a: Forma, b: Forma, t: Float) = Forma(
-  escala = l(a.escala, b.escala, t), punta = l(a.punta, b.punta, t), extremidades = l(a.extremidades, b.extremidades, t),
-  laterales = l(a.laterales, b.laterales, t), corona = l(a.corona, b.corona, t), orbita = l(a.orbita, b.orbita, t),
+fun lerpForma(a: BrasaShape, b: BrasaShape, t: Float) = BrasaShape(
+  scale = l(a.scale, b.scale, t), tip = l(a.tip, b.tip, t), limbs = l(a.limbs, b.limbs, t),
+  sideFlames = l(a.sideFlames, b.sideFlames, t), crown = l(a.crown, b.crown, t), orbit = l(a.orbit, b.orbit, t),
 )

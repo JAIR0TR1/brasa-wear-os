@@ -11,14 +11,14 @@ import android.content.Intent
  *   adb shell am broadcast -a com.brasa.app.SIMULAR -p com.brasa.app --ei pasos 6500
  *   adb shell am broadcast -a com.brasa.app.SIMULAR -p com.brasa.app --ei pulso 112
  */
-class SimuladorReceiver : BroadcastReceiver() {
+class SimulatorReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
-    if (intent.hasExtra("pasos")) CanalSalud.eventos.tryEmit(EventoSalud.Pasos(intent.getIntExtra("pasos", 0)))
+    if (intent.hasExtra("pasos")) HealthChannel.events.tryEmit(HealthEvent.Steps(intent.getIntExtra("pasos", 0)))
     if (intent.hasExtra("pulso")) {
       val bpm = intent.getIntExtra("pulso", 0)
       // Tres lecturas a 70 s (se guarda 1 por minuto; la regla exige ≥ 2 en 3 min).
-      val ahora = System.currentTimeMillis()
-      for (i in 2 downTo 0) CanalSalud.eventos.tryEmit(EventoSalud.Pulso(bpm, ahora - i * 70_000L))
+      val currentTime = System.currentTimeMillis()
+      for (i in 2 downTo 0) HealthChannel.events.tryEmit(HealthEvent.HeartRate(bpm, currentTime - i * 70_000L))
     }
   }
 }

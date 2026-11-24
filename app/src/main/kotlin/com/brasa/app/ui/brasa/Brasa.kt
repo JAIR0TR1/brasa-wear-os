@@ -30,7 +30,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.currentStateAsState
 import com.brasa.app.R
-import com.brasa.app.ui.theme.BrasaTema
+import com.brasa.app.ui.theme.BrasaTheme
 import com.brasa.app.ui.theme.Tokens
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,7 +38,7 @@ import kotlin.random.Random
 
 /** true si el sistema NO pide reducir animaciones (escala de animación > 0). */
 @Composable
-fun rememberAnimacionesActivas(): Boolean {
+fun rememberAnimationsEnabled(): Boolean {
   val ctx = LocalContext.current
   return remember {
     Settings.Global.getFloat(ctx.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
@@ -54,102 +54,102 @@ fun rememberAnimacionesActivas(): Boolean {
  */
 @Composable
 fun Brasa(
-  emocion: Emocion,
-  etapa: Etapa,
+  emotion: Emotion,
+  stage: Stage,
   modifier: Modifier = Modifier,
-  reaccion: Int = 0,
-  animado: Boolean = rememberAnimacionesActivas(),
-  tiempoFijo: Float? = null,
+  reaction: Int = 0,
+  animated: Boolean = rememberAnimationsEnabled(),
+  fixedTime: Float? = null,
 ) {
-  val oscuro = BrasaTema.colores.oscuro
-  val objetivo = remember(emocion) { poseDe(emocion) }
-  val objetivoForma = remember(etapa) { formaDe(etapa) }
+  val dark = BrasaTheme.colors.dark
+  val target = remember(emotion) { poseFor(emotion) }
+  val targetShape = remember(stage) { shapeFor(stage) }
 
-  var desde by remember { mutableStateOf(objetivo) }
-  var hacia by remember { mutableStateOf(objetivo) }
-  val progreso = remember { Animatable(1f) }
-  var desdeForma by remember { mutableStateOf(objetivoForma) }
-  var haciaForma by remember { mutableStateOf(objetivoForma) }
-  val progresoForma = remember { Animatable(1f) }
-  val rebote = remember { Animatable(1f) }
-  val risa = remember { Animatable(0f) }
-  val parpadeo = remember { Animatable(0f) }
+  var fromPose by remember { mutableStateOf(target) }
+  var hacia by remember { mutableStateOf(target) }
+  val progress = remember { Animatable(1f) }
+  var fromShape by remember { mutableStateOf(targetShape) }
+  var haciaForma by remember { mutableStateOf(targetShape) }
+  val shapeProgress = remember { Animatable(1f) }
+  val bounce = remember { Animatable(1f) }
+  val laugh = remember { Animatable(0f) }
+  val blink = remember { Animatable(0f) }
 
   // Transición entre emociones: rebote (sale y entra) + interpolación de toda la pose.
-  LaunchedEffect(emocion) {
-    if (hacia == objetivo) return@LaunchedEffect
-    desde = lerpPose(desde, hacia, progreso.value)
-    hacia = objetivo
-    progreso.snapTo(0f)
-    if (!animado) { progreso.snapTo(1f); return@LaunchedEffect }
+  LaunchedEffect(emotion) {
+    if (hacia == target) return@LaunchedEffect
+    fromPose = lerpPose(fromPose, hacia, progress.value)
+    hacia = target
+    progress.snapTo(0f)
+    if (!animated) { progress.snapTo(1f); return@LaunchedEffect }
     launch {
-      rebote.animateTo(0.84f, tween(Tokens.Duracion.rapida))
-      rebote.animateTo(1f, spring(dampingRatio = 0.42f, stiffness = 380f))
+      bounce.animateTo(0.84f, tween(Tokens.Duration.fast))
+      bounce.animateTo(1f, spring(dampingRatio = 0.42f, stiffness = 380f))
     }
-    progreso.animateTo(1f, tween(Tokens.Duracion.media + 200, easing = FastOutSlowInEasing))
+    progress.animateTo(1f, tween(Tokens.Duration.medium + 200, easing = FastOutSlowInEasing))
   }
 
-  LaunchedEffect(etapa) {
-    if (haciaForma == objetivoForma) return@LaunchedEffect
-    desdeForma = lerpForma(desdeForma, haciaForma, progresoForma.value)
-    haciaForma = objetivoForma
-    progresoForma.snapTo(0f)
-    if (!animado) { progresoForma.snapTo(1f); return@LaunchedEffect }
+  LaunchedEffect(stage) {
+    if (haciaForma == targetShape) return@LaunchedEffect
+    fromShape = lerpForma(fromShape, haciaForma, shapeProgress.value)
+    haciaForma = targetShape
+    shapeProgress.snapTo(0f)
+    if (!animated) { shapeProgress.snapTo(1f); return@LaunchedEffect }
     launch {
-      rebote.animateTo(1.15f, tween(Tokens.Duracion.media))
-      rebote.animateTo(1f, spring(dampingRatio = 0.35f, stiffness = 300f))
+      bounce.animateTo(1.15f, tween(Tokens.Duration.medium))
+      bounce.animateTo(1f, spring(dampingRatio = 0.35f, stiffness = 300f))
     }
-    progresoForma.animateTo(1f, tween(Tokens.Duracion.dibujo, easing = FastOutSlowInEasing))
+    shapeProgress.animateTo(1f, tween(Tokens.Duration.draw, easing = FastOutSlowInEasing))
   }
 
   // Reacción al toque: rebote y risa breve.
-  LaunchedEffect(reaccion) {
-    if (reaccion == 0) return@LaunchedEffect
+  LaunchedEffect(reaction) {
+    if (reaction == 0) return@LaunchedEffect
     launch {
-      rebote.snapTo(0.9f)
-      rebote.animateTo(1f, spring(dampingRatio = 0.3f, stiffness = 500f))
+      bounce.snapTo(0.9f)
+      bounce.animateTo(1f, spring(dampingRatio = 0.3f, stiffness = 500f))
     }
-    risa.animateTo(1f, tween(Tokens.Duracion.rapida))
+    laugh.animateTo(1f, tween(Tokens.Duration.fast))
     delay(700)
-    risa.animateTo(0f, tween(Tokens.Duracion.media))
+    laugh.animateTo(0f, tween(Tokens.Duration.medium))
   }
 
-  val ciclo by LocalLifecycleOwner.current.lifecycle.currentStateAsState()
-  val activo = animado && tiempoFijo == null && ciclo.isAtLeast(Lifecycle.State.RESUMED)
+  val lifecycleState by LocalLifecycleOwner.current.lifecycle.currentStateAsState()
+  val active = animated && fixedTime == null && lifecycleState.isAtLeast(Lifecycle.State.RESUMED)
 
   // Parpadeo aleatorio cada 3–6 s.
-  LaunchedEffect(activo) {
-    while (activo) {
+  LaunchedEffect(active) {
+    while (active) {
       delay(Random.nextLong(3000, 6000))
-      parpadeo.animateTo(1f, tween(70))
-      parpadeo.animateTo(0f, tween(110))
+      blink.animateTo(1f, tween(70))
+      blink.animateTo(0f, tween(110))
     }
   }
 
-  val tiempo = remember { mutableFloatStateOf(tiempoFijo ?: 0f) }
-  LaunchedEffect(activo) {
-    if (!activo) return@LaunchedEffect
-    val base = tiempo.floatValue
-    val inicio = withFrameNanos { it }
+  val time = remember { mutableFloatStateOf(fixedTime ?: 0f) }
+  LaunchedEffect(active) {
+    if (!active) return@LaunchedEffect
+    val base = time.floatValue
+    val start = withFrameNanos { it }
     while (true) {
-      withFrameNanos { tiempo.floatValue = base + (it - inicio) / 1_000_000_000f }
+      withFrameNanos { time.floatValue = base + (it - start) / 1_000_000_000f }
     }
   }
 
-  val descripcion = stringResource(
-    R.string.brasa_descripcion,
-    stringResource(nombreEmocion(emocion)),
-    stringResource(nombreEtapa(etapa)),
+  val description = stringResource(
+    R.string.brasa_description,
+    stringResource(emotionName(emotion)),
+    stringResource(stageName(stage)),
   )
-  Canvas(modifier.semantics { contentDescription = descripcion }) {
-    dibujarBrasa(
-      pose = lerpPose(desde, hacia, progreso.value),
-      forma = lerpForma(desdeForma, haciaForma, progresoForma.value),
-      t = tiempo.floatValue,
-      parpadeo = parpadeo.value,
-      rebote = rebote.value,
-      risa = risa.value,
-      oscuro = oscuro,
+  Canvas(modifier.semantics { contentDescription = description }) {
+    drawBrasa(
+      pose = lerpPose(fromPose, hacia, progress.value),
+      shape = lerpForma(fromShape, haciaForma, shapeProgress.value),
+      t = time.floatValue,
+      blink = blink.value,
+      bounce = bounce.value,
+      laugh = laugh.value,
+      dark = dark,
     )
   }
 }
@@ -159,21 +159,21 @@ fun Brasa(
  * a negro puro en los bordes (OLED: los píxeles negros no consumen).
  */
 @Composable
-fun FondoEmocion(
-  emocion: Emocion,
+fun EmotionBackground(
+  emotion: Emotion,
   modifier: Modifier = Modifier,
-  intensidad: Float = 1f,
+  intensity: Float = 1f,
   content: @Composable BoxScope.() -> Unit,
 ) {
-  val colores = BrasaTema.colores
-  val objetivo = Tokens.paleta(emocion, colores.oscuro).base
-  val color by animateColorAsState(objetivo, tween(Tokens.Duracion.transicionFondo), label = "fondo")
+  val colors = BrasaTheme.colors
+  val target = Tokens.palette(emotion, colors.dark).base
+  val color by animateColorAsState(target, tween(Tokens.Duration.backgroundTransition), label = "fondo")
   Box(
     modifier
       .fillMaxSize()
       .drawBehind {
-        drawRect(colores.fondo)
-        val a = (if (colores.oscuro) 0.42f else 0.2f) * intensidad
+        drawRect(colors.background)
+        val a = (if (colors.dark) 0.42f else 0.2f) * intensity
         drawRect(
           Brush.radialGradient(
             0f to color.copy(alpha = a),
@@ -188,17 +188,17 @@ fun FondoEmocion(
   )
 }
 
-fun nombreEmocion(e: Emocion) = when (e) {
-  Emocion.APAGADA -> R.string.emocion_apagada
-  Emocion.INQUIETA -> R.string.emocion_inquieta
-  Emocion.TRANQUILA -> R.string.emocion_tranquila
-  Emocion.FELIZ -> R.string.emocion_feliz
-  Emocion.EUFORICA -> R.string.emocion_euforica
+fun emotionName(e: Emotion) = when (e) {
+  Emotion.DIM -> R.string.emotion_dim
+  Emotion.RESTLESS -> R.string.emotion_restless
+  Emotion.CALM -> R.string.emotion_calm
+  Emotion.HAPPY -> R.string.emotion_happy
+  Emotion.ECSTATIC -> R.string.emotion_ecstatic
 }
 
-fun nombreEtapa(e: Etapa) = when (e) {
-  Etapa.CHISPA -> R.string.etapa_chispa
-  Etapa.LLAMA -> R.string.etapa_llama
-  Etapa.FOGATA -> R.string.etapa_fogata
-  Etapa.LEYENDA -> R.string.etapa_leyenda
+fun stageName(e: Stage) = when (e) {
+  Stage.SPARK -> R.string.stage_spark
+  Stage.FLAME -> R.string.stage_flame
+  Stage.BONFIRE -> R.string.stage_bonfire
+  Stage.LEGEND -> R.string.stage_legend
 }
