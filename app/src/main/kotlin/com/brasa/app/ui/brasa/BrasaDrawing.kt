@@ -49,11 +49,11 @@ fun DrawScope.drawBrasa(
   val cx0 = size.width / 2f
   // Con corona, Brasa baja un poco para no invadir el texto curvo superior.
   val cy0 = size.height / 2f - 2f * u + 9f * u * shape.crown
-  val flota = sin(t * pose.flotaVel) * pose.flotaAmp * u
+  val hover = sin(t * pose.hoverSpeed) * pose.hoverAmp * u
   val jump = -abs(sin(t * 3.2f)) * pose.jump * 7f * u
   val tremble = (sin(t * 47f) * 0.7f + sin(t * 31f) * 0.4f) * pose.tremble * u
   val cx = cx0 + tremble
-  val cy = cy0 + flota + jump
+  val cy = cy0 + hover + jump
   val breath = sin(t * 2.1f)
   val sx = bounce * (1f - 0.018f * breath)
   val sy = bounce * (1f + 0.03f * breath)
@@ -119,7 +119,7 @@ fun DrawScope.drawBrasa(
   val legColor = lerp(pose.base, pose.edge, 0.45f)
   val footColor = lerp(pose.base, pose.edge, 0.6f)
   for (side in intArrayOf(-1, 1)) {
-    val kick = sin(t * pose.flotaVel * 1.4f + side) * 7f + pose.jump * 18f
+    val kick = sin(t * pose.hoverSpeed * 1.4f + side) * 7f + pose.jump * 18f
     val a = Math.toRadians((side * (6f + kick * side)).toDouble()).toFloat()
     val hip = p(side * 0.34f * r, 0.8f * r)
     val length = legLength * (1f - 0.18f * pose.jump * abs(sin(t * 3.2f)))
@@ -196,7 +196,7 @@ fun DrawScope.drawBrasa(
   val handColor = lerp(pose.base, pose.core, 0.22f)
   for (side in intArrayOf(-1, 1)) {
     var angle = if (side < 0) pose.leftArm else pose.rightArm
-    angle += sin(t * pose.flotaVel * 1.2f + side * 0.8f) * pose.sway
+    angle += sin(t * pose.hoverSpeed * 1.2f + side * 0.8f) * pose.sway
     if (side > 0) angle += pose.wave * sin(t * 9f) * 22f
     angle += sin(t * 40f + side) * 4f * pose.tremble
     val a = Math.toRadians(angle.toDouble()).toFloat()

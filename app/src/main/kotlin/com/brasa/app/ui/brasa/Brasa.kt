@@ -66,10 +66,10 @@ fun Brasa(
   val targetShape = remember(stage) { shapeFor(stage) }
 
   var fromPose by remember { mutableStateOf(target) }
-  var hacia by remember { mutableStateOf(target) }
+  var toPose by remember { mutableStateOf(target) }
   val progress = remember { Animatable(1f) }
   var fromShape by remember { mutableStateOf(targetShape) }
-  var haciaForma by remember { mutableStateOf(targetShape) }
+  var toShape by remember { mutableStateOf(targetShape) }
   val shapeProgress = remember { Animatable(1f) }
   val bounce = remember { Animatable(1f) }
   val laugh = remember { Animatable(0f) }
@@ -77,9 +77,9 @@ fun Brasa(
 
   // Transición entre emociones: rebote (sale y entra) + interpolación de toda la pose.
   LaunchedEffect(emotion) {
-    if (hacia == target) return@LaunchedEffect
-    fromPose = lerpPose(fromPose, hacia, progress.value)
-    hacia = target
+    if (toPose == target) return@LaunchedEffect
+    fromPose = lerpPose(fromPose, toPose, progress.value)
+    toPose = target
     progress.snapTo(0f)
     if (!animated) { progress.snapTo(1f); return@LaunchedEffect }
     launch {
@@ -90,9 +90,9 @@ fun Brasa(
   }
 
   LaunchedEffect(stage) {
-    if (haciaForma == targetShape) return@LaunchedEffect
-    fromShape = lerpForma(fromShape, haciaForma, shapeProgress.value)
-    haciaForma = targetShape
+    if (toShape == targetShape) return@LaunchedEffect
+    fromShape = lerpShape(fromShape, toShape, shapeProgress.value)
+    toShape = targetShape
     shapeProgress.snapTo(0f)
     if (!animated) { shapeProgress.snapTo(1f); return@LaunchedEffect }
     launch {
@@ -143,8 +143,8 @@ fun Brasa(
   )
   Canvas(modifier.semantics { contentDescription = description }) {
     drawBrasa(
-      pose = lerpPose(fromPose, hacia, progress.value),
-      shape = lerpForma(fromShape, haciaForma, shapeProgress.value),
+      pose = lerpPose(fromPose, toPose, progress.value),
+      shape = lerpShape(fromShape, toShape, shapeProgress.value),
       t = time.floatValue,
       blink = blink.value,
       bounce = bounce.value,

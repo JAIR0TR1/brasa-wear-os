@@ -44,8 +44,8 @@ data class Pose(
   val rightArm: Float,
   val wave: Float,
   val sway: Float,
-  val flotaAmp: Float,
-  val flotaVel: Float,
+  val hoverAmp: Float,
+  val hoverSpeed: Float,
   val jump: Float,
   val tremble: Float,
   val stoke: Float,
@@ -81,7 +81,7 @@ fun poseFor(emotion: Emotion): Pose {
       eyeOpen = 0.85f, happyEye = 0f, droopyEye = 0.62f, brow = 0.7f, browVisible = 0.9f,
       mouth = -0.75f, mouthOpen = 0f, mouthTremble = 0f, cheeks = 0f,
       leftArm = 6f, rightArm = 6f, wave = 0f, sway = 3f,
-      flotaAmp = 1.2f, flotaVel = 0.9f, jump = 0f, tremble = 0f, stoke = 0.25f,
+      hoverAmp = 1.2f, hoverSpeed = 0.9f, jump = 0f, tremble = 0f, stoke = 0.25f,
       tear = 1f, sweat = 0f, sparks = 0f, glow = 0.35f,
     )
     Emotion.RESTLESS -> Pose(
@@ -89,7 +89,7 @@ fun poseFor(emotion: Emotion): Pose {
       eyeOpen = 1.32f, happyEye = 0f, droopyEye = 0f, brow = 1f, browVisible = 1f,
       mouth = 0f, mouthOpen = 0f, mouthTremble = 1f, cheeks = 0f,
       leftArm = -78f, rightArm = -78f, wave = 0f, sway = 4f,
-      flotaAmp = 1.6f, flotaVel = 2.6f, jump = 0f, tremble = 1f, stoke = 1.4f,
+      hoverAmp = 1.6f, hoverSpeed = 2.6f, jump = 0f, tremble = 1f, stoke = 1.4f,
       tear = 0f, sweat = 1f, sparks = 0f, glow = 0.75f,
     )
     Emotion.CALM -> Pose(
@@ -97,7 +97,7 @@ fun poseFor(emotion: Emotion): Pose {
       eyeOpen = 1f, happyEye = 0f, droopyEye = 0f, brow = 0f, browVisible = 0f,
       mouth = 0.55f, mouthOpen = 0f, mouthTremble = 0f, cheeks = 0.35f,
       leftArm = 26f, rightArm = 26f, wave = 0f, sway = 7f,
-      flotaAmp = 2.2f, flotaVel = 1.3f, jump = 0f, tremble = 0f, stoke = 0.7f,
+      hoverAmp = 2.2f, hoverSpeed = 1.3f, jump = 0f, tremble = 0f, stoke = 0.7f,
       tear = 0f, sweat = 0f, sparks = 0f, glow = 0.7f,
     )
     Emotion.HAPPY -> Pose(
@@ -105,7 +105,7 @@ fun poseFor(emotion: Emotion): Pose {
       eyeOpen = 1.22f, happyEye = 0f, droopyEye = 0f, brow = 0f, browVisible = 0f,
       mouth = 1f, mouthOpen = 0.75f, mouthTremble = 0f, cheeks = 1f,
       leftArm = 34f, rightArm = 148f, wave = 1f, sway = 5f,
-      flotaAmp = 2.6f, flotaVel = 1.9f, jump = 0f, tremble = 0f, stoke = 1f,
+      hoverAmp = 2.6f, hoverSpeed = 1.9f, jump = 0f, tremble = 0f, stoke = 1f,
       tear = 0f, sweat = 0f, sparks = 0f, glow = 0.9f,
     )
     Emotion.ECSTATIC -> Pose(
@@ -113,7 +113,7 @@ fun poseFor(emotion: Emotion): Pose {
       eyeOpen = 1f, happyEye = 1f, droopyEye = 0f, brow = 0f, browVisible = 0f,
       mouth = 1f, mouthOpen = 1f, mouthTremble = 0f, cheeks = 1f,
       leftArm = 158f, rightArm = 158f, wave = 0f, sway = 12f,
-      flotaAmp = 1f, flotaVel = 3.2f, jump = 1f, tremble = 0f, stoke = 1.5f,
+      hoverAmp = 1f, hoverSpeed = 3.2f, jump = 1f, tremble = 0f, stoke = 1.5f,
       tear = 0f, sweat = 0f, sparks = 1f, glow = 1f,
     )
   }
@@ -127,13 +127,13 @@ fun lerpPose(a: Pose, b: Pose, t: Float) = Pose(
   droopyEye = l(a.droopyEye, b.droopyEye, t), brow = l(a.brow, b.brow, t), browVisible = l(a.browVisible, b.browVisible, t),
   mouth = l(a.mouth, b.mouth, t), mouthOpen = l(a.mouthOpen, b.mouthOpen, t), mouthTremble = l(a.mouthTremble, b.mouthTremble, t),
   cheeks = l(a.cheeks, b.cheeks, t), leftArm = l(a.leftArm, b.leftArm, t), rightArm = l(a.rightArm, b.rightArm, t),
-  wave = l(a.wave, b.wave, t), sway = l(a.sway, b.sway, t), flotaAmp = l(a.flotaAmp, b.flotaAmp, t),
-  flotaVel = l(a.flotaVel, b.flotaVel, t), jump = l(a.jump, b.jump, t), tremble = l(a.tremble, b.tremble, t),
+  wave = l(a.wave, b.wave, t), sway = l(a.sway, b.sway, t), hoverAmp = l(a.hoverAmp, b.hoverAmp, t),
+  hoverSpeed = l(a.hoverSpeed, b.hoverSpeed, t), jump = l(a.jump, b.jump, t), tremble = l(a.tremble, b.tremble, t),
   stoke = l(a.stoke, b.stoke, t), tear = l(a.tear, b.tear, t), sweat = l(a.sweat, b.sweat, t),
   sparks = l(a.sparks, b.sparks, t), glow = l(a.glow, b.glow, t),
 )
 
-fun lerpForma(a: BrasaShape, b: BrasaShape, t: Float) = BrasaShape(
+fun lerpShape(a: BrasaShape, b: BrasaShape, t: Float) = BrasaShape(
   scale = l(a.scale, b.scale, t), tip = l(a.tip, b.tip, t), limbs = l(a.limbs, b.limbs, t),
   sideFlames = l(a.sideFlames, b.sideFlames, t), crown = l(a.crown, b.crown, t), orbit = l(a.orbit, b.orbit, t),
 )
